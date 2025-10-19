@@ -283,24 +283,21 @@ graph LR;
     A(Start) -- [0-9] --> B(* B);
     B -- [0-9] --> B;
     A -- . --> C;
-    B -- . --> D(* D);
-    C -- [0-9] --> E(* E);
-    E -- [0-9] --> E;
+    B -- . --> D((* Accept LFLOAT));
+    C -- [0-9] --> D;
     D -- [0-9] --> D;
     
-    %% Caminho FLOAT_PADRAO + [fF]
-    D -- f/F --> F((Accept LFLOAT));
-    E -- f/F --> F((Accept LFLOAT));
+    %% Caminho FLOAT_PADRAO + [fF]?
+    D -- f/F --> E((Accept LFLOAT));
     
     %% Caminho FLOAT_CIENTIFICA
-    B -- e/E --> G;
-    D -- e/E --> G;
-    E -- e/E --> G;
+    B -- e/E --> F;
+    D -- e/E --> F;
     
-    G -- [+-] --> H;
-    G -- [0-9] --> I((* Accept LFLOAT));
-    H -- [0-9] --> I((* Accept LFLOAT));
-    I -- [0-9] --> I;
+    F -- [+-] --> G;
+    F -- [0-9] --> H((* Accept LFLOAT));
+    G -- [0-9] --> H((* Accept LFLOAT));
+    H -- [0-9] --> H;
 ```
 
 
@@ -544,3 +541,4 @@ A(Start) -- ":" --> B((Accept COLLON));
 ```
 
 ---
+
