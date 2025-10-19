@@ -123,3 +123,424 @@ Ao final, quando o estado do objeto vinculado ao ciclo for reconhecido como "ina
 ## Estrutura do projeto
 
 ## Teste e Exemplos
+
+## Regras de Transição (em Mermaid)
+
+### Palavras Reservadas
+
+**Token:** RETURN
+```mermaid
+graph LR;
+A(Start) -- r/R --> B;
+B -- e/E --> C;
+C -- t/T --> D;
+D -- u/U --> E;
+E -- r/R --> F;
+F -- n/N --> G((Accept RETURN));
+```
+
+**Token:** NULL
+```mermaid
+graph LR;
+A(Start) -- n/N --> B;
+B -- u/U --> C;
+C -- l/L --> D;
+D -- l/L --> E((Accept NULL));
+```
+
+**Token:** ATH
+```mermaid
+graph LR;
+A(Start) -- ~ --> B;
+B -- a/A --> C;
+C -- t/T --> D;
+D -- h/H --> E((Accept ATH));
+```
+
+**Token:** EXECUTE
+```mermaid
+graph LR;
+A(Start) -- e/E --> B;
+B -- x/X --> C;
+C -- e/E --> D;
+D -- c/C --> E;
+E -- u/U --> F;
+F -- t/T --> G;
+G -- e/E --> H((Accept EXECUTE));
+```
+
+**Token:** THIS
+```mermaid
+graph LR;
+A(Start) -- t/T --> B;
+B -- h/H --> C;
+C -- i/I --> D;
+D -- s/S --> E((Accept THIS));
+```
+
+**Token:** SELF
+```mermaid
+graph LR;
+A(Start) -- s/S --> B;
+B -- e/E --> C;
+C -- l/L --> D;
+D -- f/F --> E((Accept SELF));
+```
+
+**Token:** IMPORT
+```mermaid
+graph LR;
+A(Start) -- i/I --> B;
+B -- m/M --> C;
+C -- p/P --> D;
+D -- o/O --> E;
+E -- r/R --> F;
+F -- t/T --> G((Accept IMPORT));
+```
+
+**Token:** INPUT
+```mermaid
+graph LR;
+A(Start) -- i/I --> B;
+B -- n/N --> C;
+C -- p/P --> D;
+D -- u/U --> E;
+E -- t/T --> F((Accept INPUT));
+```
+
+**Token:** LEND
+```mermaid
+graph LR;
+A(Start) -- l/L --> B;
+B -- e/E --> C;
+C -- n/N --> D;
+D -- d/D --> E((Accept LEND));
+```
+
+**Token:** CHAR
+```mermaid
+graph LR;
+A(Start) -- c/C --> B;
+B -- h/H --> C;
+C -- a/A --> D;
+D -- r/R --> E((Accept CHAR));
+```
+
+**Token:** ENTITY
+```mermaid
+graph LR;
+A(Start) -- e/E --> B;
+B -- n/N --> C;
+C -- t/T --> D;
+D -- i/I --> E;
+E -- t/T --> F;
+F -- y/Y --> G((Accept ENTITY));
+```
+
+**Token:** ARRAY
+```mermaid
+graph LR;
+A(Start) -- a/A --> B;
+B -- r/R --> C;
+C -- r/R --> D;
+D -- a/A --> E;
+E -- y/Y --> F((Accept ARRAY));
+```
+
+**Token:** INT
+```mermaid
+graph LR;
+A(Start) -- i/I --> B;
+B -- n/N --> C;
+C -- t/T --> D((Accept INT));
+```
+
+**Token:** FLOAT
+```mermaid
+graph LR;
+A(Start) -- f/F --> B;
+B -- l/L --> C;
+C -- o/O --> D;
+D -- a/A --> E;
+E -- t/T --> F((Accept FLOAT));
+```
+
+---
+
+### Tipos e Literais
+
+**Token:** LINT
+```mermaid
+graph LR;
+A(Start) -- [0-9] --> B((* Accept LINT));
+B -- [0-9] --> B;
+```
+
+
+**Token:** LFLOAT
+```mermaid
+graph LR;
+    A(Start) -- [0-9] --> B(* B);
+    B -- [0-9] --> B;
+    A -- . --> C;
+    B -- . --> D(* D);
+    C -- [0-9] --> E(* E);
+    E -- [0-9] --> E;
+    D -- [0-9] --> D;
+    
+    %% Caminho FLOAT_PADRAO + [fF]
+    D -- f/F --> F((Accept LFLOAT));
+    E -- f/F --> F((Accept LFLOAT));
+    
+    %% Caminho FLOAT_CIENTIFICA
+    B -- e/E --> G;
+    D -- e/E --> G;
+    E -- e/E --> G;
+    
+    G -- [+-] --> H;
+    G -- [0-9] --> I((* Accept LFLOAT));
+    H -- [0-9] --> I((* Accept LFLOAT));
+    I -- [0-9] --> I;
+```
+
+
+**Token:** LCHAR
+```mermaid
+graph LR;
+A(Start) -- ' --> B;
+B -- \ --> C;
+B -- [^'] --> D;
+C -- [^'] --> D;
+D -- ' --> E((Accept LCHAR));
+```
+
+
+**Token:** LSTRING
+```mermaid
+graph LR;
+A(Start) -- '' --> B(* B);
+B -- [^''\n] --> B;
+B -- '' --> C((Accept LSTRING));
+```
+OBS: como o mermaid tem problemas como o caractere de aspas duplas, esse diagrama usa duas aspas simples como substituto.
+
+**Token:** ID
+```mermaid
+graph LR;
+A(Start) -- [a-zA-Z~] --> B((* Accept ID));
+B -- [a-zA-Z_0-9~] --> B;
+```
+
+### Operadores relacionais e lógicos
+
+**Token:** ISEQU
+```mermaid
+graph LR;
+A(Start) -- "=" --> B;
+B -- "=" --> C((Accept ISEQU));
+```
+
+**Token:** ISDIF
+```mermaid
+graph LR;
+A(Start) -- "!" --> B;
+B -- "=" --> C((Accept ISDIF));
+```
+
+**Token:** LT
+```mermaid
+graph LR;
+A(Start) -- "<" --> B((Accept LT));
+```
+
+**Token:** GT
+```mermaid
+graph LR;
+A(Start) -- ">" --> B((Accept GT));
+```
+
+**Token:** LTE
+```mermaid
+graph LR;
+A(Start) -- "<" --> B;
+B -- "=" --> C((Accept LTE));
+```
+
+**Token:** GTE
+```mermaid
+graph LR;
+A(Start) -- ">" --> B;
+B -- "=" --> C((Accept GTE));
+```
+
+### Operadores de incremento e atribuição
+
+**Token:** INC
+```mermaid
+graph LR;
+A(Start) -- "+" --> B;
+B -- "+" --> C((Accept INC));
+```
+
+**Token:** DEC
+```mermaid
+graph LR;
+A(Start) -- "-" --> B;
+B -- "-" --> C((Accept DEC));
+```
+
+**Token:** ATRIB
+```mermaid
+graph LR;
+A(Start) -- "=" --> B((Accept ATRIB));
+```
+
+**Token:** SUMATRIB
+```mermaid
+graph LR;
+A(Start) -- "+" --> B;
+B -- "=" --> C((Accept SUMATRIB));
+```
+
+**Token:** SUBATRIB
+```mermaid
+graph LR;
+A(Start) -- "-" --> B;
+B -- "=" --> C((Accept SUBATRIB));
+```
+
+**Token:** MULATRIB
+```mermaid
+graph LR;
+A(Start) -- "*" --> B;
+B -- "=" --> C((Accept MULATRIB));
+```
+
+**Token:** DIVATRIB
+```mermaid
+graph LR;
+A(Start) -- "/" --> B;
+B -- "=" --> C((Accept DIVATRIB));
+```
+
+### Operadores aritméticos
+
+**Token:** SUM
+```mermaid
+graph LR;
+A(Start) -- "+" --> B((Accept SUM));
+```
+
+**Token:** SUB
+```mermaid
+graph LR;
+A(Start) -- "-" --> B((Accept SUB));
+```
+
+**Token:** MUL
+```mermaid
+graph LR;
+A(Start) -- "*" --> B((Accept MUL));
+```
+
+**Token:** DIV
+```mermaid
+graph LR;
+A(Start) -- "/" --> B((Accept DIV));
+```
+
+### Operadores lógicos
+
+**Token:** AND
+```mermaid
+graph LR;
+A(Start) -- "&" --> B;
+B -- "&" --> C((Accept AND));
+```
+
+**Token:** OR
+```mermaid
+graph LR;
+A(Start) -- "|" --> B;
+B -- "|" --> C((Accept OR));
+```
+
+**Token:** XOR
+```mermaid
+graph LR;
+A(Start) -- "^" --> B;
+B -- "^" --> C((Accept XOR));
+```
+
+**Token:** NOT
+```mermaid
+graph LR;
+A(Start) -- "!" --> B((Accept NOT));
+```
+
+**Token:** ACCESS
+```mermaid
+graph LR;
+A(Start) -- "-" --> B;
+B -- ">" --> C((Accept ACCESS));
+```
+
+---
+
+### Símbolos Especiais
+
+**Token:** SCOLLON
+```mermaid
+graph LR;
+A(Start) -- ";" --> B((Accept SCOLLON));
+```
+
+**Token:** COMMA
+```mermaid
+graph LR;
+A(Start) -- "," --> B((Accept COMMA));
+```
+
+**Token:** PTOPEN
+```mermaid
+graph LR;
+A(Start) -- "(" --> B((Accept PTOPEN));
+```
+
+**Token:** PTCLOSE
+```mermaid
+graph LR;
+A(Start) -- ")" --> B((Accept PTCLOSE));
+```
+
+**Token:** BTOPEN
+```mermaid
+graph LR;
+A(Start) -- "{" --> B((Accept BTOPEN));
+```
+
+**Token:** BTCLOSE
+```mermaid
+graph LR;
+A(Start) -- "}" --> B((Accept BTCLOSE));
+```
+
+**Token:** SBOPEN
+```mermaid
+graph LR;
+A(Start) -- "[" --> B((Accept SBOPEN));
+```
+
+**Token:** SBCLOSE
+```mermaid
+graph LR;
+A(Start) -- "]" --> B((Accept SBCLOSE));
+```
+
+**Token:** COLLON
+```mermaid
+graph LR;
+A(Start) -- ":" --> B((Accept COLLON));
+```
+
+---
