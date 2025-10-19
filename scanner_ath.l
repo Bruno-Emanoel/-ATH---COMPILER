@@ -25,17 +25,16 @@ typedef enum {
     T_KW_CHAR    = 270,
     T_KW_STRING  = 271,
     T_KW_ARRAY   = 272,
-    T_KW_BOOLEAN = 273,
 
     // OP = OPERATOR
-    T_OP_ADD     = 274,
-    T_OP_SUB     = 275,
-    T_OP_MUL     = 276,
-    T_OP_DIV     = 277,
-    T_OP_ATRIB   = 278,
-    T_OP_SUMATB  = 279,
-    T_OP_SUBATB  = 280,
-    T_OP_MULATB  = 281,
+    T_OP_ADD     = 273,
+    T_OP_SUB     = 274,
+    T_OP_MUL     = 275,
+    T_OP_DIV     = 276,
+    T_OP_ATRIB   = 277,
+    T_OP_SUMATB  = 278,
+    T_OP_SUBATB  = 279,
+    T_OP_MULATB  = 280,
     T_OP_DIVATB  = 281, 
     T_OP_ISEQU   = 282,
     T_OP_NOTEQ   = 283,
@@ -55,23 +54,23 @@ typedef enum {
     T_SP_SMCOLON = 295,
     T_SP_COLON   = 296,
     T_SP_COMMA   = 297,
-    T_SP_PARENTESESLFT = 299,
-    T_SP_PARENTESESRGT = 300,
-    T_SP_BRACKETSLFT   = 301,
-    T_SP_BRACKETSRGT   = 302,
-    T_SP_BRACESLFT     = 303,
-    T_SP_BRACESRGT     = 304,
+    T_SP_PARENTESESLFT = 298,
+    T_SP_PARENTESESRGT = 299,
+    T_SP_BRACKETSLFT   = 300,
+    T_SP_BRACKETSRGT   = 301,
+    T_SP_BRACESLFT     = 302,
+    T_SP_BRACESRGT     = 303,
 
-    T_ID = 305,
+    T_ID = 304,
     
     // Literais
-    T_INTEGER    = 306,
-    T_FLOAT      = 307,
-    T_CHAR       = 308,
-    T_STRING     = 309,
+    T_INTEGER    = 305,
+    T_FLOAT      = 306,
+    T_CHAR       = 307,
+    T_STRING     = 308,
     
-    T_EOF        = 310,
-    T_UNKNOWN    = 311
+    T_EOF        = 309,
+    T_UNKNOWN    = 310
 } TokenType;
 
 /* yylval é a variável global usada pelo Flex e Bison para trocar 
@@ -110,7 +109,9 @@ LETRA             [a-zA-Z_]
 ID                [a-zA-Z~]({LETRA}|{DIGITO}|~)*
 ID_INVALIDO       ({DIGITO}|"_")({LETRA}|{DIGITO}|~)*
 INTEIRO           {DIGITO}+
-FLOAT             {DIGITO}+\.{DIGITO}*
+FLOAT_PADRAO      (({DIGITO}*"."{DIGITO}+)|({DIGITO}+"."{DIGITO}*))
+FLOAT_CIENTIFICA  ((({DIGITO}+)|({FLOAT_PADRAO}))[eE][+-]?{DIGITO}+)
+FLOAT             {FLOAT_CIENTIFICA}|({FLOAT_PADRAO})[fF]?
 COMENTARIO_LINHA  \/\/[^\n]*
 COMENTARIO_BLOCO  \/\*([^*]|\*+[^*/])*\*+\/
 CHAR_LITERAL      \'\\?[^']\'
@@ -135,11 +136,13 @@ STRING_LITERAL    \"[^"\n]*\"
 [Ll][eE][nN][dD]               { return T_LEND; }
 
 [cC][hH][aA][rR]               { return T_KW_CHAR; }
+[eE][nN][tT][iI][tT][yY]       { return T_KW_ENTITY; }
+[aA][rR][rR][aA][yY]           { return T_KW_ARRAY; }
 [iI][nN][tT]                   { return T_KW_INT; }
 [fF][lL][Oo][aA][tT]           { return T_KW_FLOAT; }
 
+{FLOAT}        { yylval = atof(yytext); return T_FLOAT; }
 {INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
-{FLOAT}        { return T_FLOAT; }
 {CHAR_LITERAL} { return T_CHAR; }
 {STRING_ABERTA}  { printf("\nErro Léxico na linha %d String não terminada %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
 {STRING_LITERAL} { return T_STRING; }
@@ -150,9 +153,9 @@ STRING_LITERAL    \"[^"\n]*\"
 "=="           { return T_OP_ISEQU; }
 "!="           { return T_OP_NOTEQ; }
 "<"            { return T_OP_LESSER; }
-"> "            { return T_OP_GREATER; }
-"<="           { return T_OP_GRTEQU; }
-">="           { return T_OP_LSSEQU; }
+">"            { return T_OP_GREATER; }
+"<="           { return T_OP_LSSEQU; }
+">="           { return T_OP_GRTEQU; }
 
 "++"           { return T_OP_INC; }
 "--"           { return T_OP_DEC; }
@@ -330,7 +333,7 @@ int main(int argc, char **argv) {
             printf("<INT, %d>", yylval);
             break;
           case T_FLOAT:
-            printf("<LFLOAT, %s>", yytext);
+            printf("<LFLOAT, %f>", (float)yylval);
             break;
           case T_CHAR:
             printf("<LCHAR, %s>", yytext);
@@ -339,7 +342,7 @@ int main(int argc, char **argv) {
             printf("<LSTRING, %s>", yytext);
             break;
           case T_ID:
-            printf("<ID, %d>", get_symbol_position(yytext));
+            printf("<ID, %d>", yylval);
             break;
         }
         printf(" ");
