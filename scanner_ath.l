@@ -4,7 +4,7 @@
 #include <string.h>
 
 /* Adriano Maia - Para integração com o Bison/Yacc, os tokens seriam definidos 
-   em um arquivo de cabeçalho compartilhado (ex: y.tab.h). 
+   em um arquivo de cabeçalho compartilhado (ex y.tab.h). 
    Por enquanto, definimos aqui. */
 
 typedef enum {
@@ -136,7 +136,7 @@ STRING_LITERAL    \"[^"\n]*\"
 {INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
 {FLOAT}        { return T_FLOAT; }
 {CHAR_LITERAL} { return T_CHAR; }
-{STRING_ABERTA}  { printf("Erro Léxico na linha %d: String não terminada: %s", line_count, yytext); line_count++; return T_UNKNOWN;}
+{STRING_ABERTA}  { printf("Erro Léxico na linha %d String não terminada %s", line_count, yytext); line_count++; return T_UNKNOWN;}
 {STRING_LITERAL} { return T_STRING; }
 
 {ID}           { yylval = get_symbol_position(yytext); return T_ID; }
@@ -167,7 +167,9 @@ STRING_LITERAL    \"[^"\n]*\"
 ")"            { return T_SP_PARENTESESRGT; }
 "{"            { return T_SP_BRACKETSLFT; }
 "}"            { return T_SP_BRACKETSRGT; }
-
+"["            { return T_SP_BRACESLFT; }
+"]"            { return T_SP_BRACESRGT; }
+":"            { return T_SP_COLON}
 
 %%
 /* Seção de Código do Usuário */
