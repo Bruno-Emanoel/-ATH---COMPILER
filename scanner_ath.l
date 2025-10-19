@@ -125,7 +125,6 @@ STRING_LITERAL    \"[^"\n]*\"
 [eE][xX][eE][cC][uU][tT][eE] { return T_EXECUTE; }
 [tT][hH][iI][sS] { return T_THIS; }
 [Ss][Ee][Ll][fF] { return T_SELF; }
-[nN][uU][lL][lL] { return T_NULL; }
 [iI][mM][pP][oO][rR][tT] { return T_IMPORT; };
 [iI][nN][pP][uU][tT]     { return T_INPUT; };
 [Ll][eE][nN][dD]         { return T_LEND; }
@@ -315,7 +314,7 @@ int main(int argc, char **argv) {
             printf("<BTCLOSE>");
             break;
           case T_INTEGER:
-            printf("<LINT, %s>", yylval);
+            printf("<INT, %d>", yylval);
             break;
           case T_FLOAT:
             printf("<LFLOAT, %s>", yytext);
