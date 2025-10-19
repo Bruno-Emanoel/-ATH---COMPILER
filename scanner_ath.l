@@ -119,7 +119,7 @@ STRING_LITERAL    \"[^"\n]*\"
 
 /* Seção de Regras */
 %%
-[ \t]+         { /* Ignorar espaços em branco e tabulações */ }
+[\0 \r\t]+         { /* Ignorar espaços em branco e tabulações */ }
 \n             { line_count++; }
 {COMENTARIO_LINHA} { /* Ignora comentário de linha */ }
 {COMENTARIO_BLOCO} { /* Ignora comentário de bloco */ }
@@ -181,6 +181,9 @@ STRING_LITERAL    \"[^"\n]*\"
 "["            { return T_SP_BRACESLFT; }
 "]"            { return T_SP_BRACESRGT; }
 ":"            { return T_SP_COLON;}
+
+.              { printf("Erro Léxico na linha %d: Caractere inesperado '%s'\n", line_count, yytext); return T_UNKNOWN; }
+
 
 %%
 /* Seção de Código do Usuário */
