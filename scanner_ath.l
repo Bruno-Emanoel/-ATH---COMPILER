@@ -60,6 +60,8 @@ typedef enum {
     T_STRING 	= 298,
     T_EOF 	= 299,
     T_UNKNOWN 	= 300
+
+    T_FUNC_OBJ = 306
 } TokenType;
 
 /* yylval é a variável global usada pelo Flex e Bison para trocar 
@@ -118,10 +120,17 @@ STRING_LITERAL    \"[^"\n]*\"
 [wW][hH][iI][lL][eE]        { return T_WHILE; }
 [fF][oO][rR]          { return T_FOR; }
 ~[Aa][Tt][Hh]  { return T_ATH; }
+[eE][xX][eE][cC][uU][tT][eE] { return T_EXECUTE; }
+[tT][hH][iI][sS] { return T_THIS; }
+[Ss][Ee][Ll][fF] { return T_SELF; }
+[nN][uU][lL][lL] { return T_NULL; }
+[iI][mM][pP][oO][rR][tT] { return T_IMPORT; };
+[iI][nN][pP][uU][tT]     { return T_INPUT; };
+[Ll][eE][nN][dD]         { return T_LEND; }
 
-"char"         { return T_KW_CHAR; }
-"int"          { return T_KW_INT; }
-"float"        { return T_KW_FLOAT; }
+[cC][hH][aA][rR]         { return T_KW_CHAR; }
+[iI][nN][tT]          { return T_KW_INT; }
+[fF][lL][Oo][aA][tT]       { return T_KW_FLOAT; }
 
 {INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
 {FLOAT}        { return T_FLOAT; }
@@ -134,7 +143,7 @@ STRING_LITERAL    \"[^"\n]*\"
 "=="           { return T_OP_ISEQU; }
 "!="           { return T_OP_NOTEQ; }
 "<"            { return T_OP_LESSER; }
-">"            { return T_OP_GREATER; }
+"> "            { return T_OP_GREATER; }
 "<="           { return T_OP_GRTEQU; }
 ">="           { return T_OP_LSSEQU; }
 
@@ -158,8 +167,6 @@ STRING_LITERAL    \"[^"\n]*\"
 "{"            { return T_SP_BRACKETSLFT; }
 "}"            { return T_SP_BRACKETSRGT; }
 
-\"[^\"]*\n|[^\"]*\"\n { printf("Erro léxico na linha %d: String não terminada\n", line_count); }
-.              { printf("Erro Léxico na linha %d: Caractere inesperado '%s'\n", line_count, yytext); return T_UNKNOWN; }
 
 %%
 /* Seção de Código do Usuário */
@@ -175,140 +182,142 @@ int main(int argc, char **argv) {
 
     int token_id;
     while ((token_id = yylex())) {
-        printf("Token: %d ", token_id);
+        if(token_id == 294){
+            printf("<id, %d> ", get_symbol_position(yytext));
+        }
 
         switch ( token_id ) {
           case T_ATH:
-            printf("(ATH)     | Lexema: %s\n", yytext);
+            printf("<ATH> ");
             break;
           case T_EXECUTE:
-            printf("(EXECUTE)     | Lexema: %s\n", yytext);
+            printf("<EXECUTE> ");
             break;
           case T_THIS:
-            printf("(THIS)     | Lexema: %s\n", yytext);
+            printf("<THIS> ");
             break;
           case T_SELF:
-            printf("(SELF)     | Lexema: %s\n", yytext);
+            printf("<SELF> ");
             break;
           case T_NULL:
-            printf("(NULL)     | Lexema: %s\n", yytext);
+            printf("<NULL> ");
             break;
           case T_IMPORT:
-            printf("(IMPORT)     | Lexema: %s\n", yytext);
+            printf("<IMPORT> ");
             break;
           case T_LEND:
-            printf("(LEND)     | Lexema: %s\n", yytext);
+            printf("<LEND> ");
           break;
           case T_INPUT:
-            printf("(INPUT)     | Lexema: %s\n", yytext);
+            printf("<INPUT> ");
           break;
           case T_IF:
-            printf("(IF)     | Lexema: %s\n", yytext);
+            printf("<IF> ");
           break;
           case T_ELSE:
-            printf("(ELSE)     | Lexema: %s\n", yytext);
+            printf("<ELSE> ");
           break;
           case T_RETURN:
-            printf("(RETURN)     | Lexema: %s\n", yytext);
+            printf("<RETURN> ");
           break;
           case T_WHILE:
-            printf("(WHILE)     | Lexema: %s\n", yytext);
+            printf("<WHILE> ");
           break;
           case T_FOR:
-            printf("(FOR)     | Lexema: %s\n", yytext);
+            printf("<FOR> ");
           break;
           case T_VOID:
-            printf("(VOID)     | Lexema: %s\n", yytext);
+            printf("<VOID> ");
           break;
           case T_KW_ENTITY:
-            printf("(ENTITY)     | Lexema: %s\n", yytext);
+            printf("<ENTITY> ");
           break;
           case T_KW_CHAR:
-            printf("(CHAR)     | Lexema: %s\n", yytext);
+            printf("<CHAR> ");
           break;
           case T_KW_INT:
-            printf("(INT)     | Lexema: %s\n", yytext);
+            printf("<INT> ");
           break;
           case T_KW_FLOAT:
-            printf("(FLOAT)     | Lexema: %s\n", yytext);
+            printf("<FLOAT> ");
           break;
           case T_OP_ADD:
-            printf("(ADD)     | Lexema: %s\n", yytext);
+            printf("<+> ");
           break;
           case T_OP_SUB:
-            printf("(SUB)     | Lexema: %s\n", yytext);
+            printf("<-> ");
           break;
           case T_OP_MUL:
-            printf("(MUL)     | Lexema: %s\n", yytext);
+            printf("<*> ");
           break;
           case T_OP_DIV:
-            printf("(DIV)     | Lexema: %s\n", yytext);
+            printf("<\\> ");
           break;
           case T_OP_ATRIB:
-            printf("(ATRIB)     | Lexema: %s\n", yytext);
+            printf("<=> ");
           break;
           case T_OP_ISEQU:
-            printf("(ISEQU)     | Lexema: %s\n", yytext);
+            printf("<==> ");
           break;
           case T_OP_NOTEQ:
-            printf("(NOTEQ)     | Lexema: %s\n", yytext);
+            printf("<!=");
           break;
           case T_OP_GREATER:
-            printf("(GREATER)     | Lexema: %s\n", yytext);
+            printf("< > > ");
           break;
           case T_OP_LESSER:
-            printf("(LESSER)     | Lexema: %s\n", yytext);
+            printf("< < > ");
           break;
           case T_OP_GRTEQU:
-            printf("(GRTEQU)     | Lexema: %s\n", yytext);
+            printf("< >= > ");
           break;
           case T_OP_LSSEQU:
-            printf("(LSSEQU)     | Lexema: %s\n", yytext);
+            printf("< <= > ");
           break;
           case T_OP_INC:
-            printf("(INC)     | Lexema: %s\n", yytext);
+            printf("<++> ");
           break;
           case T_OP_DEC:
-            printf("(DEC)     | Lexema: %s\n", yytext);
+            printf("<--> ");
           break;
           case T_OP_AND:
-            printf("(AND)     | Lexema: %s\n", yytext);
+            printf("<&&> ");
           break;
           case T_OP_OR:
-            printf("(OR)     | Lexema: %s\n", yytext);
+            printf("<||> ");
           break;
           case T_OP_NOT:
-            printf("(NOT)     | Lexema: %s\n", yytext);
+            printf("< ! > ");
           break;
           case T_SP_SMCOLON:
-            printf("(SMCOLON)     | Lexema: %s\n", yytext);
+            printf("< ; > ");
           break;
           case T_SP_COMMA:
-            printf("(COMMA)     | Lexema: %s\n", yytext);
+            printf("< , > ");
           break;
           case T_SP_PARENTESESLFT:
-            printf("(PARENTESESLFT)     | Lexema: %s\n", yytext);
+            printf("< ( > ");
           break;
           case T_SP_PARENTESESRGT:
-            printf("(PARENTESESRGT)     | Lexema: %s\n", yytext);
+            printf("< ) > ");
           break;
           case T_SP_BRACKETSLFT:
-            printf("(BRACKETSLFT)     | Lexema: %s\n", yytext);
+            printf("< { > ");
           break;
           case T_SP_BRACKETSRGT:
-            printf("(BRACKETSRGT)     | Lexema: %s\n", yytext);
+            printf("< } > ");
           break;
           case T_INTEGER:
-            printf("(Integer)  | Valor: %d\n", yylval);
+            printf("<int, %d> ", yylval);
           break;
           case T_FLOAT:
-            printf("(Float)    | Lexema: %s\n", yytext);
+            printf("<float, %s> ", yytext);
           break;
           case T_CHAR:
-            printf("(Char)     | lexema: %s\n", yytext);
+            printf("<char %s> ", yytext);
           break;
           case T_STRING:
-            printf("(String)   | Lexema: %s\n", yytext);
+            printf("<string, %s> ", yytext);
           break;
         }
     }
