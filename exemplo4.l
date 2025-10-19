@@ -10,5 +10,5 @@ int val;
 ~ATH(val = list1[i]){ // vai pegando valores de list1 até achar 0
     ~ATH(){} EXECUTE( Print{i + ": " + val} );
 } EXECUTE (NULL);
-THIS.DIE(); // Finalizar
+THIS->DIE(); // Finalizar
 

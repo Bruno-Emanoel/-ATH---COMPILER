@@ -180,7 +180,7 @@ STRING_LITERAL    \"[^"\n]*\"
 "}"            { return T_SP_BRACKETSRGT; }
 "["            { return T_SP_BRACESLFT; }
 "]"            { return T_SP_BRACESRGT; }
-":"            { return T_SP_COLON}
+":"            { return T_SP_COLON;}
 
 %%
 /* Seção de Código do Usuário */
