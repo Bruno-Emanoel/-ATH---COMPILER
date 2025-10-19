@@ -10,4 +10,4 @@ int num = 2;
     SELF.DIE(); // Mata o ciclo sem passar por execute
 } EXECUTE ( Print{"É maior"} );// Ao final imprime "É maior"
 
-THIS.DIE(); // Finalizar
+THIS->DIE(); // Finalizar

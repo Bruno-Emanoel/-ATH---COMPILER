@@ -6,4 +6,4 @@ int num = 2;
     ~ATH(){} EXECUTE ( num += 4; );
 } EXECUTE (NULL); // Ao final não faz nada
 
-THIS.DIE(); // Finalizar
+THIS->DIE(); // Finalizar

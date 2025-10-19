@@ -20,4 +20,4 @@ int num = 2;
            // São passados os parâmetros num e 5 (a e b)
 } EXECUTE ( Print{ Sum(num, 5 ) } );
 
-THIS.DIE(); // Finalizar
+THIS->DIE(); // Finalizar
