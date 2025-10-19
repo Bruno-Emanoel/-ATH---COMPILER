@@ -41,119 +41,80 @@ Ao final, quando o estado do objeto vinculado ao ciclo for reconhecido como "ina
 
 ## Lexemas e Tokens
 
-### Palavras reservadas
+## Lexemas e Tokens
 
-* `~ATH`: Indica o início de um "ciclo de vida" ou "loop"
-    * \<~ATH>
-* `EXECUTE`: Indica o fim de um "ciclo de vida" e a ação que será executa ao seu término
-    * \<EXECUTE>
-* `THIS`: Se refere ao escopo global do programa. É possível realizar ações como DIE e EXECUTE.
-    * \<THIS>
-* `SELF`: Se refere ao escopo local do programa, ou o "ciclo" atual.
-    * \<SELF>
-* `NULL`: Entidade vazia, pode ser chamada como "função" mas não realiza nenhuma ação.
-    * \<NULL>
-* `IMPORT`: Importa outros módulos ou constructos da biblioteca padrão.
-    * \<IMPORT>
-* `LEND`: Toma a referência de um valor.
-    * \<LEND>
-* `INPUT`: Define uma posse de um ciclo como "entrada" ou "argumento".
-    * \<INPUT>
-* `RETURN`: Define uma posse de um ciclo como "saida" ou "retorno".
-    * \<RETURN>
-* `INT`: Palavra chave para identificar tipagem de variável como valor inteiro.
-    * \<INT>
-* `FLOAT`: Palavra chave para identificar tipagem de variável como valor de ponto flutuante.
-    * \<FLOAT>
-* `CHAR`: Palavra chave para identificar tipagem de variável como valor de caractere.
-    * \<CHAR>
-* `STRING`: Palavra chave para identificar tipagem de variável como valor de string ou texto.
-    * \<STRING>
-* `ARRAY`: Palavra chave para identificar tipagem de variável como valor composto de diversos tipos.
-    * \<ARRAY>
-* `ENTITY`: Palavra chave para identificar tipagem de variável como valor complexo que pode ser executado como ciclo próprio.
-    * \<ENTITY>
+### Palavras Reservadas
+
+| Categoria | Token | Lexema | Descrição |
+|-----------|-------|--------|-----------|
+| Controle de Ciclo | `<~ATH>` | `~ATH` | Indica o início de um "ciclo de vida" ou "loop" |
+| Controle de Ciclo | `<EXECUTE>` | `EXECUTE` | Indica o fim de um "ciclo de vida" e a ação que será executada ao seu término |
+| Controle de Ciclo | `<THIS>` | `THIS` | Se refere ao escopo global do programa |
+| Controle de Ciclo | `<SELF>` | `SELF` | Se refere ao escopo local do programa, ou o "ciclo" atual |
+| Valores Especiais | `<NULL>` | `NULL` | Entidade vazia, pode ser chamada como "função" mas não realiza nenhuma ação |
+| Modularidade | `<IMPORT>` | `IMPORT` | Importa outros módulos ou constructos da biblioteca padrão |
+| Referência | `<LEND>` | `LEND` | Toma a referência de um valor |
+| Funções | `<INPUT>` | `INPUT` | Define uma posse de um ciclo como "entrada" ou "argumento" |
+| Funções | `<RETURN>` | `RETURN` | Define uma posse de um ciclo como "saída" ou "retorno" |
+| Tipos | `<INT>` | `INT` | Palavra chave para identificar tipagem de variável como valor inteiro |
+| Tipos | `<FLOAT>` | `FLOAT` | Palavra chave para identificar tipagem de variável como valor de ponto flutuante |
+| Tipos | `<CHAR>` | `CHAR` | Palavra chave para identificar tipagem de variável como valor de caractere |
+| Tipos | `<STRING>` | `STRING` | Palavra chave para identificar tipagem de variável como valor de string ou texto |
+| Tipos | `<ARRAY>` | `ARRAY` | Palavra chave para identificar tipagem de variável como valor composto de diversos tipos |
+| Tipos | `<ENTITY>` | `ENTITY` | Palavra chave para identificar tipagem de variável como valor complexo que pode ser executado como ciclo próprio |
 
 ### Operadores
 
-* `=`: Operador de atribuição
-    * \<ATRIB>
-* `+`: Operador de soma
-    * \<SUM>
-* `-`: Operador de subtração
-    * \<SUB>
-* `++`: Operador de incremento
-    * \<INC>
-* `--`: Operador de decremento
-    * \<DEC>
-* `*`: Operador de multiplicação
-    * \<MUL>
-* `/`: Operador de divisão
-    * \<DIV>
-* `->`: Operador de acesso
-    * \<ACCESS>
-* `==`: Operador de "igual à"
-    * \<ISEQU>
-* `!=`: Operador de "diferente de"
-    * \<ISDIF>
-* `<`: Operador de "menor que"
-    * \<LT>
-* `>`: Operador de "maior que"
-    * \<GT>
-* `<=`: Operador de "menor ou igual"
-    * \<LTE>
-* `>=`: Operador de "maior ou igual"
-    * \<GTE>
-* `||`: Operador de "Ou" lógico
-    * \<OR>
-* `&&`: Operador de "E" lógico
-    * \<AND>
-* `!`: Operador de "Não" lógico
-    * \<NOT>
-* `^^`: Operador de "Ou exclusivo" lógico
-    * \<XOR>
+| Token | Lexema | Descrição |
+|-------|--------|-----------|
+| `<ATRIB>` | `=` | Operador de atribuição |
+| `<SUM>` | `+` | Operador de soma |
+| `<SUB>` | `-` | Operador de subtração |
+| `<INC>` | `++` | Operador de incremento |
+| `<DEC>` | `--` | Operador de decremento |
+| `<MUL>` | `*` | Operador de multiplicação |
+| `<DIV>` | `/` | Operador de divisão |
+| `<ACCESS>` | `->` | Operador de acesso |
+| `<ISEQU>` | `==` | Operador de "igual à" |
+| `<ISDIF>` | `!=` | Operador de "diferente de" |
+| `<LT>` | `<` | Operador de "menor que" |
+| `<GT>` | `>` | Operador de "maior que" |
+| `<LTE>` | `<=` | Operador de "menor ou igual" |
+| `<GTE>` | `>=` | Operador de "maior ou igual" |
+| `<OR>` | `\|\|` | Operador de "Ou" lógico |
+| `<AND>` | `&&` | Operador de "E" lógico |
+| `<NOT>` | `!` | Operador de "Não" lógico |
+| `<XOR>` | `^^` | Operador de "Ou exclusivo" lógico |
 
 ### Separadores
 
-* `;`: Delimitador de expressões
-    * \<SCOLLON>
-* `:`: Indicador de ciclo interno
-    * \<COLLON>
-* `,`: Separador de argumentos
-    * \<COMMA>
-* `.`: Operador de acesso especial
-    * \<DOT>
-* `(`: Delimitador de expressão (abertura)
-    * \<PTOPEN>
-* `)`: Delimitador de expressão (fechamento)
-    * \<PTCLOSE>
-* `[`: Especificador de array (abertura)
-    * \<SBOPEN>
-* `]`: Especificador de array (abertura)
-    * \<SBCLOSE>
-* `{`: Delimitador de composição (abertura)
-    * \<BTOPEN>
-* `}`: Delimitador de composição (abertura)
-    * \<BTCLOSE>
+| Token | Lexema | Descrição |
+|-------|--------|-----------|
+| `<SCOLLON>` | `;` | Delimitador de expressões |
+| `<COLLON>` | `:` | Indicador de ciclo interno |
+| `<COMMA>` | `,` | Separador de argumentos |
+| `<DOT>` | `.` | Operador de acesso especial |
+| `<PTOPEN>` | `(` | Delimitador de expressão (abertura) |
+| `<PTCLOSE>` | `)` | Delimitador de expressão (fechamento) |
+| `<SBOPEN>` | `[` | Especificador de array (abertura) |
+| `<SBCLOSE>` | `]` | Especificador de array (fechamento) |
+| `<BTOPEN>` | `{` | Delimitador de composição (abertura) |
+| `<BTCLOSE>` | `}` | Delimitador de composição (fechamento) |
 
 ### Literais
 
-* Inteiros: numeros inteiros literais, com suporte para decimal, binário, octal e hexadecimal. 
-    * \<LINT, 123>
+| Token | Lexema | Descrição | Exemplo |
+|-------|--------|-----------|---------|
+| `<LINT>` | Números inteiros | Números inteiros literais, com suporte para decimal, binário, octal e hexadecimal | `<LINT, 123>` |
+| `<LFLOAT>` | Números com casa decimal | Números com casa decimal ou notação científica | `<LFLOAT, 1.2>` |
+| `<LCHAR>` | Caracteres entre aspas simples | Caracter normal ou especial (escapado) entre aspas simples | `<LCHAR, 'c'>` |
+| `<LSTRING>` | Sequência de caracteres | Sequência de caracteres entre aspas duplas | `<LSTRING, "alo">` |
 
-* Ponto flutuante: Números com casa decimal ou notação científica
-    * \<LFLOAT, 1.2>
+### Identificadores (Posses)
 
-* Caracter: caracter normal ou especial(escapado) entre aspas simples
-    * \<LCHAR, 'c'>
-
-* Strings: Sequencia de caracteres
-    * \<LSTRING, "alo">
-
-### Posses (Variáveis)
-
-* Posses: São as variáveis em `~ATH`, elas devem começar com uma letra ou til(~) e são formados por letras, digitos, underscore (_) ou til (~)
-    * \<ID, (num)>
+| Token | Lexema | Descrição | Padrão |
+|-------|--------|-----------|--------|
+| `<ID>` | Identificadores | Variáveis em `~ATH`, devem começar com uma letra ou til(~) e são formados por letras, dígitos, underscore (_) ou til (~) | `[a-zA-Z~][a-zA-Z0-9_~]*` |
 
 ## Estrutura do projeto
 
