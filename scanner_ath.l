@@ -18,7 +18,7 @@ typedef enum {
     T_INPUT      = 265,
     T_RETURN     = 266,
 
-    // Types
+    // KW = KEYWORD
     T_KW_ENTITY  = 267,
     T_KW_INT     = 268,
     T_KW_FLOAT   = 269,
@@ -27,47 +27,52 @@ typedef enum {
     T_KW_ARRAY   = 272,
     T_KW_BOOLEAN = 273,
 
-    // Operators
+    // OP = OPERATOR
     T_OP_ADD     = 274,
     T_OP_SUB     = 275,
     T_OP_MUL     = 276,
     T_OP_DIV     = 277,
     T_OP_ATRIB   = 278,
-    T_OP_ISEQU   = 279,
-    T_OP_NOTEQ   = 280,
-    T_OP_GREATER = 281,
-    T_OP_LESSER  = 282,
-    T_OP_GRTEQU  = 283,
-    T_OP_LSSEQU  = 284,
-    T_OP_INC     = 285,
-    T_OP_DEC     = 286,
-    T_OP_AND     = 287,
-    T_OP_OR      = 288,
-    T_OP_NOT     = 289,
-    T_OP_XOR     = 290,
-    T_OP_ACCESS  = 291,
+    T_OP_SUMATB  = 279,
+    T_OP_SUBATB  = 280,
+    T_OP_MULATB  = 281,
+    T_OP_DIVATB  = 281, 
+    T_OP_ISEQU   = 282,
+    T_OP_NOTEQ   = 283,
+    T_OP_GREATER = 284,
+    T_OP_LESSER  = 285,
+    T_OP_GRTEQU  = 286,
+    T_OP_LSSEQU  = 287,
+    T_OP_INC     = 288,
+    T_OP_DEC     = 289,
+    T_OP_AND     = 290,
+    T_OP_OR      = 291,
+    T_OP_NOT     = 292,
+    T_OP_XOR     = 293,
+    T_OP_ACCESS  = 294,
 
     // Separators
-    T_SP_SMCOLON = 292,
-    T_SP_COLON   = 293,
-    T_SP_COMMA   = 294,
-    T_SP_DOT     = 295,
-    T_SP_PARENTESESLFT = 296,
-    T_SP_PARENTESESRGT = 297,
-    T_SP_BRACKETSLFT   = 298,
-    T_SP_BRACKETSRGT   = 299,
-    T_SP_BRACESLFT     = 300,
-    T_SP_BRACESRGT     = 301,
+    T_SP_SMCOLON = 295,
+    T_SP_COLON   = 296,
+    T_SP_COMMA   = 297,
+    T_SP_DOT     = 298,
+    T_SP_PARENTESESLFT = 299,
+    T_SP_PARENTESESRGT = 300,
+    T_SP_BRACKETSLFT   = 301,
+    T_SP_BRACKETSRGT   = 302,
+    T_SP_BRACESLFT     = 303,
+    T_SP_BRACESRGT     = 304,
 
-    // Literals and Identifiers
-    T_ID = 302,
-    T_INTEGER    = 303,
-    T_FLOAT      = 304,
-    T_CHAR       = 305,
-    T_STRING     = 306,
+    T_ID = 305,
     
-    T_EOF        = 307,
-    T_UNKNOWN    = 308
+    // Literais
+    T_INTEGER    = 306,
+    T_FLOAT      = 307,
+    T_CHAR       = 308,
+    T_STRING     = 309,
+    
+    T_EOF        = 310,
+    T_UNKNOWN    = 311
 } TokenType;
 
 /* yylval é a variável global usada pelo Flex e Bison para trocar 
@@ -120,18 +125,18 @@ STRING_LITERAL    \"[^"\n]*\"
 {COMENTARIO_BLOCO} { /* Ignora comentário de bloco */ }
 
 [rR][eE][tT][uU][rR][nN]       { return T_RETURN; }
-[nN][uU][lL][lL]         { return T_NULL; }
-~[Aa][Tt][Hh]  { return T_ATH; }
-[eE][xX][eE][cC][uU][tT][eE] { return T_EXECUTE; }
-[tT][hH][iI][sS] { return T_THIS; }
-[Ss][Ee][Ll][fF] { return T_SELF; }
-[iI][mM][pP][oO][rR][tT] { return T_IMPORT; };
-[iI][nN][pP][uU][tT]     { return T_INPUT; };
-[Ll][eE][nN][dD]         { return T_LEND; }
+[nN][uU][lL][lL]               { return T_NULL; }
+~[Aa][Tt][Hh]                  { return T_ATH; }
+[eE][xX][eE][cC][uU][tT][eE]   { return T_EXECUTE; }
+[tT][hH][iI][sS]               { return T_THIS; }
+[Ss][Ee][Ll][fF]               { return T_SELF; }
+[iI][mM][pP][oO][rR][tT]       { return T_IMPORT; };
+[iI][nN][pP][uU][tT]           { return T_INPUT; };
+[Ll][eE][nN][dD]               { return T_LEND; }
 
-[cC][hH][aA][rR]         { return T_KW_CHAR; }
-[iI][nN][tT]          { return T_KW_INT; }
-[fF][lL][Oo][aA][tT]       { return T_KW_FLOAT; }
+[cC][hH][aA][rR]               { return T_KW_CHAR; }
+[iI][nN][tT]                   { return T_KW_INT; }
+[fF][lL][Oo][aA][tT]           { return T_KW_FLOAT; }
 
 {INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
 {FLOAT}        { return T_FLOAT; }
@@ -151,15 +156,21 @@ STRING_LITERAL    \"[^"\n]*\"
 "++"           { return T_OP_INC; }
 "--"           { return T_OP_DEC; }
 
+"="            { return T_OP_ATRIB; }
+"+="           { return T_OP_SUMATB; }
+"-="           { return T_OP_SUBATB; }
+"*="           { return T_OP_MULATB; }
+"/="           { return T_OP_DIVATB; }
 "+"            { return T_OP_ADD; }
 "-"            { return T_OP_SUB; }
 "*"            { return T_OP_MUL; }
 "/"            { return T_OP_DIV; }
-"="            { return T_OP_ATRIB; }
 
 "&&"           { return T_OP_AND; }
 "||"           { return T_OP_OR; }
+"^^"           { return T_OP_XOR; }
 "!"            { return T_OP_NOT; }
+"->"           { return T_OP_ACCESS; }
 
 ";"            { return T_SP_SMCOLON; }
 ","            { return T_SP_COMMA; }
@@ -331,7 +342,7 @@ int main(int argc, char **argv) {
             printf("<ID, %d>", get_symbol_position(yytext));
             break;
         }
-        printf(" "); // Add space between tokens
+        printf(" ");
     }
 
     // Adicione este trecho para imprimir a tabela de símbolos

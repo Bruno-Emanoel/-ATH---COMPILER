@@ -68,6 +68,10 @@ Ao final, quando o estado do objeto vinculado ao ciclo for reconhecido como "ina
 | Token | Lexema | Descrição |
 |-------|--------|-----------|
 | `<ATRIB>` | `=` | Operador de atribuição |
+| `<SUMATRIB>` | `+=` | Operador de atribuição com soma |
+| `<SUBATRIB>` | `-=` | Operador de atribuição com subtração |
+| `<MULATRIB>` | `*=` | Operador de atribuição com multiplicação |
+| `<DIVATRIB>` | `/=` | Operador de atribuição com divisão |
 | `<SUM>` | `+` | Operador de soma |
 | `<SUB>` | `-` | Operador de subtração |
 | `<INC>` | `++` | Operador de incremento |
