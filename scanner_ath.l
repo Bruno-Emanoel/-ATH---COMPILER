@@ -55,7 +55,6 @@ typedef enum {
     T_SP_SMCOLON = 295,
     T_SP_COLON   = 296,
     T_SP_COMMA   = 297,
-    T_SP_DOT     = 298,
     T_SP_PARENTESESLFT = 299,
     T_SP_PARENTESESRGT = 300,
     T_SP_BRACKETSLFT   = 301,
@@ -108,7 +107,8 @@ int get_symbol_position(const char *id) {
 /* Definições de Expressões Regulares (apelidos) */
 DIGITO            [0-9]
 LETRA             [a-zA-Z_]
-ID                {LETRA}({LETRA}|{DIGITO})*
+ID                [a-zA-Z~]({LETRA}|{DIGITO}|~)*
+ID_INVALIDO       ({DIGITO}|"_")({LETRA}|{DIGITO}|~)*
 INTEIRO           {DIGITO}+
 FLOAT             {DIGITO}+\.{DIGITO}*
 COMENTARIO_LINHA  \/\/[^\n]*
@@ -141,9 +141,10 @@ STRING_LITERAL    \"[^"\n]*\"
 {INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
 {FLOAT}        { return T_FLOAT; }
 {CHAR_LITERAL} { return T_CHAR; }
-{STRING_ABERTA}  { printf("Erro Léxico na linha %d String não terminada %s", line_count, yytext); line_count++; return T_UNKNOWN;}
+{STRING_ABERTA}  { printf("\nErro Léxico na linha %d String não terminada %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
 {STRING_LITERAL} { return T_STRING; }
 
+{ID_INVALIDO}  { printf("\nErro Léxico na linha %d Identificador inválido: %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
 {ID}           { yylval = get_symbol_position(yytext); return T_ID; }
 
 "=="           { return T_OP_ISEQU; }
@@ -180,7 +181,10 @@ STRING_LITERAL    \"[^"\n]*\"
 "}"            { return T_SP_BRACKETSRGT; }
 "["            { return T_SP_BRACESLFT; }
 "]"            { return T_SP_BRACESRGT; }
-":"            { return T_SP_COLON}
+":"            { return T_SP_COLON; }
+
+
+.              { printf("Erro Léxico na linha %d: Caractere inesperado '%s'\n", line_count, yytext); return T_UNKNOWN; }
 
 %%
 /* Seção de Código do Usuário */
@@ -304,9 +308,6 @@ int main(int argc, char **argv) {
             break;
           case T_SP_COMMA:
             printf("<COMMA>");
-            break;
-          case T_SP_DOT:
-            printf("<DOT>");
             break;
           case T_SP_PARENTESESLFT:
             printf("<PTOPEN>");
