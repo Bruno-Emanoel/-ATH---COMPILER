@@ -3,7 +3,7 @@
 |Nome|Github|
 |----|------|
 |Allan Barros Cruz|[link](https://github.com/Alfabeto-Allan)|
-|Bruno Emanoel|[link]((https://github.com/Bruno-Emanoel))|
+|Bruno Emanoel|[link](https://github.com/Bruno-Emanoel)|
 |Cecília Brito|[link](https://github.com/cecilia-brito)|
 
 ### Sumário
@@ -870,5 +870,6 @@ A(Start) -- ":" --> B((Accept COLLON));
 ```
 
 ---
+
 
 
