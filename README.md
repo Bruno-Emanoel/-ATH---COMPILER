@@ -160,11 +160,11 @@ INT execucao = Ciclo( 10 ); // 15
 
 #### Entidade Posse
 
-Uma `Entidade Posse` é simplesmente uma entidade declarada como posse de outra. É possível ver um exemplo [na seção anterior](#exemplo-de-bloco-de-posse). Como visto, para declara um Entidade posse é apenas necessário fornecer o nome da entidade e indicar com dois pontos (:) que sua especificação será dada em sequência. A identação é opcional, mas considerada um boa prática. O fim da declaração da entidade de posse será considerado o fim do [bloco de ciclo](#blocos-de-ciclo) da mesma.
+Uma `Entidade Posse` é simplesmente uma entidade declarada como posse de outra. É possível ver um exemplo [na seção anterior](#exemplo-de-bloco-de-posse). Como visto, para declarar uma Entidade posse é apenas necessário fornecer o nome da entidade e indicar com dois pontos (:) que sua especificação será dada em sequência. A identação é opcional, mas considerada um boa prática. O fim da declaração da entidade de posse será considerado o fim do [bloco de ciclo](#blocos-de-ciclo) da mesma.
 
 É possível utilizar as Entidades Posse como módulos internos ou argumentos de execução. Para utilizar o ciclo de uma entidade são utilizados parenteses (`()`) onde deverão estar listados em ordem os valores fornecidos para as posses de `INPUT`. Essa execução é considerada uma expressão e assumirá o valor na posse atribuida como `RETURN`, ou `NULL` caso não exista nenhuma.
 
-Entidades de posse não tem acesso a qualquer posse externa não fornecida como input. Porém, suas posses podem ser acessadas atavés do operador de acesso (`->`). Acessar posses antes de serem inicializadas é considerado como tendo comportamento indefinido, seu código deve ter inicializar as posses antes de serem acessadas para evitar esse tipo de comportamento.
+Entidades de posse não tem acesso a qualquer posse externa não fornecida como input. Porém, suas posses podem ser acessadas atavés do operador de acesso (`->`). Acessar posses antes de serem inicializadas é considerado como tendo comportamento indefinido, seu código deve inicializar as posses antes de serem acessadas para evitar esse tipo de comportamento.
 
 ##### Exemplo de Entidade Posse
 ```~ATH
@@ -870,3 +870,4 @@ A(Start) -- ":" --> B((Accept COLLON));
 ```
 
 ---
+
