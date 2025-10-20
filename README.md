@@ -386,6 +386,68 @@ Expressões de atribuição são válidas dentro de um EXECUTE, pois não possue
 
 ## Teste e Exemplos
 
+Na pasta tests há 5 códigos de exemplo da linguagem ~ATH, 4 com códigos escritos corretamente e um com código escrito de forma incorreta(com erro léxico).
+
+### Exemplo 1
+
+Exemplo de estrutura básica de um código na linguagem, ele atribui 2 a variável num enquanto num <= 10.
+
+```
+int num = 2;
+~ATH(num <= 10){ 
+    ~ATH(){} EXECUTE ( num += 4; );
+} EXECUTE (NULL); 
+THIS->DIE();
+```
+## Exemplo 2
+
+Exemplo mais complexo em relação ao anterior. Utiliza a importação de entidades posses e também demonstra a utilização de instruções de controle de ciclo com o uso do SELF.DIE() para matar o ciclo antes de EXECUTE.
+```
+import console{ Print }; 
+int num = 2;
+~ATH(num <= 10){ 
+    ~ATH(){} EXECUTE ( Print{"é menor ou igual"} );
+    SELF.DIE(); // Mata o ciclo sem passar por execute
+} EXECUTE ( Print{"É maior"} );
+THIS->DIE();
+```
+
+## Exemplo 3
+
+Esse exemplo demonstra a declaração de funções, o uso de funções de i/o padrões e outros tipos primitivos para variáveis.
+```
+import console{ Print }; 
+Sum:
+    int a = input();
+    int b = input(); 
+    int c = return();
+    ~ATH(){} EXECUTE ( c = a + b; );
+    SELF->DIE();
+int num = 2;
+float f = 1.25e4;
+~ATH(){
+} EXECUTE ( Print{ Sum(num, 5 ) } );
+THIS->DIE();
+```
+## Exemplo 4 
+
+Esse exemplo demonstra, além do que já tinha sido exemplificado anteriormente, o uso de arrays na linguagem.
+
+```
+import console{ Print };
+array[int] list1 = [1, 2, 3, 4, 5]; 
+array[float] list2[10];
+int i = 0;
+int val;
+~ATH(val = list1[i]){
+    ~ATH(){} EXECUTE( Print{i + ": " + val} );
+} EXECUTE (NULL);
+THIS->DIE(); 
+```
+
+## Exemplo 5
+
+Código escrito de forma incorreta com erro léxico e de string aberta.
 ## Regras de Transição (em Mermaid)
 
 ### Palavras Reservadas
