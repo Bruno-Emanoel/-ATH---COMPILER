@@ -1,0 +1,8 @@
+String msg = "Olá";
+int num = input();
+~ATH(num >= 99){
+    --num^;  
+    ~ATH(){} EXECUTE ( Print {"Olá user + num});
+} EXECUTE (NULL);
+
+THIS->DIE();
