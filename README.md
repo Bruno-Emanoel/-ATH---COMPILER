@@ -350,11 +350,11 @@ Expressões de atribuição são válidas dentro de um EXECUTE, pois não possue
 
 ## Teste e Exemplos
 
-    Na pasta tests há 5 códigos de exemplo da linguagem ~ATH, 4 com códigos escritos corretamente e um com código escrito de forma incorreta(com erro léxico).
+Na pasta tests há 5 códigos de exemplo da linguagem ~ATH, 4 com códigos escritos corretamente e um com código escrito de forma incorreta(com erro léxico).
 
 ### Exemplo 1
 
-    Exemplo de estrutura básica de um código na linguagem, ele atribui 2 a variável num enquanto num <= 10.
+Exemplo de estrutura básica de um código na linguagem, ele atribui 2 a variável num enquanto num <= 10.
 
 ```
 int num = 2;
@@ -365,7 +365,7 @@ THIS->DIE();
 ```
 ## Exemplo 2
 
-    Exemplo mais complexo em relação ao anterior. Utiliza a importação de entidades posses e também demonstra a utilização de instruções de controle de ciclo com o uso do SELF.DIE() para matar o ciclo antes de EXECUTE.
+Exemplo mais complexo em relação ao anterior. Utiliza a importação de entidades posses e também demonstra a utilização de instruções de controle de ciclo com o uso do SELF.DIE() para matar o ciclo antes de EXECUTE.
 ```
 import console{ Print }; 
 int num = 2;
@@ -378,7 +378,7 @@ THIS->DIE();
 
 ## Exemplo 3
 
-    Esse exemplo demonstra a declaração de funções, o uso de funções de i/o padrões e outros tipos primitivos para variáveis.
+Esse exemplo demonstra a declaração de funções, o uso de funções de i/o padrões e outros tipos primitivos para variáveis.
 ```
 import console{ Print }; 
 Sum:
@@ -395,7 +395,7 @@ THIS->DIE();
 ```
 ## Exemplo 4 
 
-    Esse exemplo demonstra, além do que já tinha sido exemplificado anteriormente, o uso de arrays na linguagem.
+Esse exemplo demonstra, além do que já tinha sido exemplificado anteriormente, o uso de arrays na linguagem.
 
 ```
 import console{ Print };
@@ -411,7 +411,7 @@ THIS->DIE();
 
 ## Exemplo 5
 
-    Código escrito de forma incorreta com erro léxico e de string aberta.
+Código escrito de forma incorreta com erro léxico e de string aberta.
 ## Regras de Transição (em Mermaid)
 
 ### Palavras Reservadas
