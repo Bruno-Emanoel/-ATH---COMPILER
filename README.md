@@ -8,31 +8,19 @@
 
 ### Sumário
 
+
+
 - [~ATH - COMPILADORES](#ath---compiladores)
     - [Integrantes](#integrantes)
     - [Sumário](#sumário)
   - [Resumo](#resumo)
   - [Introdução](#introdução)
-      - [exemplo 1](#exemplo-1)
   - [Estrutura da linguagem](#estrutura-da-linguagem)
     - [Blocos de Ciclo](#blocos-de-ciclo)
-      - [exemplo 2](#exemplo-2)
     - [Entidades (ENTITY)](#entidades-entity)
-      - [Entidade Principal](#entidade-principal)
-        - [Bloco de Importação](#bloco-de-importação)
-          - [Exemplo de importação](#exemplo-de-importação)
-        - [Bloco de Entidade](#bloco-de-entidade)
-          - [Exemplo de Bloco de Posse](#exemplo-de-bloco-de-posse)
-      - [Entidade Posse](#entidade-posse)
-        - [Exemplo de Entidade Posse](#exemplo-de-entidade-posse)
-      - [Entidade Composta](#entidade-composta)
-      - [Entidade imediata](#entidade-imediata)
-        - [Exemplo de entidade imediata](#exemplo-de-entidade-imediata)
     - [Instruções de controle de ciclo](#instruções-de-controle-de-ciclo)
     - [Comandos e Operações](#comandos-e-operações)
     - [Valores e referências](#valores-e-referências)
-      - [Referências primitivas](#referências-primitivas)
-      - [Cópias de entidades](#cópias-de-entidades)
     - [EXECUTE](#execute)
   - [Lexemas e Tokens](#lexemas-e-tokens)
     - [Palavras Reservadas](#palavras-reservadas)
@@ -42,6 +30,11 @@
     - [Identificadores (Posses)](#identificadores-posses)
   - [Estrutura do projeto](#estrutura-do-projeto)
   - [Teste e Exemplos](#teste-e-exemplos)
+    - [Exemplo 1](#exemplo-1-1)
+    - [Exemplo 2](#exemplo-2-1)
+    - [Exemplo 3](#exemplo-3)
+    - [Exemplo 4](#exemplo-4)
+    - [Exemplo 5](#exemplo-5)
   - [Regras de Transição (em Mermaid)](#regras-de-transição-em-mermaid)
     - [Palavras Reservadas](#palavras-reservadas-1)
     - [Tipos e Literais](#tipos-e-literais)
@@ -392,17 +385,17 @@ Na pasta tests há 5 códigos de exemplo da linguagem ~ATH, 4 com códigos escri
 
 Exemplo de estrutura básica de um código na linguagem, ele atribui 2 a variável num enquanto num <= 10.
 
-```
+```~ATH
 int num = 2;
 ~ATH(num <= 10){ 
     ~ATH(){} EXECUTE ( num += 4; );
 } EXECUTE (NULL); 
 THIS->DIE();
 ```
-## Exemplo 2
+### Exemplo 2
 
 Exemplo mais complexo em relação ao anterior. Utiliza a importação de entidades posses e também demonstra a utilização de instruções de controle de ciclo com o uso do SELF.DIE() para matar o ciclo antes de EXECUTE.
-```
+```~ATH
 import console{ Print }; 
 int num = 2;
 ~ATH(num <= 10){ 
@@ -412,10 +405,10 @@ int num = 2;
 THIS->DIE();
 ```
 
-## Exemplo 3
+### Exemplo 3
 
 Esse exemplo demonstra a declaração de funções, o uso de funções de i/o padrões e outros tipos primitivos para variáveis.
-```
+```~ATH
 import console{ Print }; 
 Sum:
     int a = input();
@@ -429,11 +422,11 @@ float f = 1.25e4;
 } EXECUTE ( Print{ Sum(num, 5 ) } );
 THIS->DIE();
 ```
-## Exemplo 4 
+### Exemplo 4 
 
 Esse exemplo demonstra, além do que já tinha sido exemplificado anteriormente, o uso de arrays na linguagem.
 
-```
+```~ATH
 import console{ Print };
 array[int] list1 = [1, 2, 3, 4, 5]; 
 array[float] list2[10];
@@ -445,9 +438,21 @@ int val;
 THIS->DIE(); 
 ```
 
-## Exemplo 5
+### Exemplo 5
 
 Código escrito de forma incorreta com erro léxico e de string aberta.
+
+```~ATH
+String msg = "Olá";
+int num = input();
+~ATH(num >= 99){
+    --num^;  
+    ~ATH(){} EXECUTE ( Print {"Olá user + num});
+} EXECUTE (NULL);
+
+THIS->DIE();
+```
+
 ## Regras de Transição (em Mermaid)
 
 ### Palavras Reservadas
