@@ -9,10 +9,11 @@ Sum:
     ~ATH(){} EXECUTE ( c = a + b; );
 
 
-    SELF.DIE();
+    SELF->DIE();
 
 // Definição de variáveis
 int num = 2;
+float f = 1.25e4;
 
 ~ATH(){
     // Não realiza nada dentro do loop
