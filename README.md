@@ -2,18 +2,54 @@
 ### Integrantes
 |Nome|Github|
 |----|------|
-|Bruno Emanoel|[link](github.com)|
-|Cecília Brito|[link](github.com)|
-|Allan Barros|[link](github.com)|
+|Allan Barros Cruz|[link](https://github.com/Alfabeto-Allan)|
+|Bruno Emanoel|[link]([github.com](https://github.com/Bruno-Emanoel))|
+|Cecília Brito|[link](https://github.com/cecilia-brito)|
 
 ### Sumário
 
-1. [Resumo](#resumo)
-2. [Introdução](#introdução)
-3. [Estrutura da linguagem](#estrutura-da-linguagem)
-4. [Lexemas e Tokens](#lexemas-e-tokens)
-5. [Estrutura do projeto](#estrutura-do-projeto)
-6. [Teste e Exemplos](#teste)
+- [~ATH - COMPILADORES](#ath---compiladores)
+    - [Integrantes](#integrantes)
+    - [Sumário](#sumário)
+  - [Resumo](#resumo)
+  - [Introdução](#introdução)
+      - [exemplo 1](#exemplo-1)
+  - [Estrutura da linguagem](#estrutura-da-linguagem)
+    - [Blocos de Ciclo](#blocos-de-ciclo)
+      - [exemplo 2](#exemplo-2)
+    - [Entidades (ENTITY)](#entidades-entity)
+      - [Entidade Principal](#entidade-principal)
+        - [Bloco de Importação](#bloco-de-importação)
+          - [Exemplo de importação](#exemplo-de-importação)
+        - [Bloco de Entidade](#bloco-de-entidade)
+          - [Exemplo de Bloco de Posse](#exemplo-de-bloco-de-posse)
+      - [Entidade Posse](#entidade-posse)
+        - [Exemplo de Entidade Posse](#exemplo-de-entidade-posse)
+      - [Entidade Composta](#entidade-composta)
+      - [Entidade imediata](#entidade-imediata)
+        - [Exemplo de entidade imediata](#exemplo-de-entidade-imediata)
+    - [Instruções de controle de ciclo](#instruções-de-controle-de-ciclo)
+    - [Comandos e Operações](#comandos-e-operações)
+    - [Valores e referências](#valores-e-referências)
+      - [Referências primitivas](#referências-primitivas)
+      - [Cópias de entidades](#cópias-de-entidades)
+    - [EXECUTE](#execute)
+  - [Lexemas e Tokens](#lexemas-e-tokens)
+    - [Palavras Reservadas](#palavras-reservadas)
+    - [Operadores](#operadores)
+    - [Separadores](#separadores)
+    - [Literais](#literais)
+    - [Identificadores (Posses)](#identificadores-posses)
+  - [Estrutura do projeto](#estrutura-do-projeto)
+  - [Teste e Exemplos](#teste-e-exemplos)
+  - [Regras de Transição (em Mermaid)](#regras-de-transição-em-mermaid)
+    - [Palavras Reservadas](#palavras-reservadas-1)
+    - [Tipos e Literais](#tipos-e-literais)
+    - [Operadores relacionais e lógicos](#operadores-relacionais-e-lógicos)
+    - [Operadores de incremento e atribuição](#operadores-de-incremento-e-atribuição)
+    - [Operadores aritméticos](#operadores-aritméticos)
+    - [Operadores lógicos](#operadores-lógicos)
+    - [Símbolos Especiais](#símbolos-especiais)
 
 ## Resumo
 
@@ -35,7 +71,7 @@ THIS->DIE();
 
 A palavra chave `~ATH` define um "ciclo" ou "loop" de maneira análoga a linguagens tradicionais. Dentro dos parênteses seguintes é possível "vincular" algum valor ou objeto da linguagem cujo estado será checado ao final de cada iteração deste ciclo. Dentro das chaves é aceito código com a mesma estrutura representada. 
 
-Ao final, quando o estado do objeto vinculado ao ciclo for reconhecido como "inativo" ou "morto", então não será realizada uma nova execução, e será feita uma chamada para uma função pelo campo `EXECUTE` ao fim do loop, nesse caso nada será executado, evidenciado pela palavra reservada `NULL`. Por fim, `THIS.DIE()` é uma boa prática para finalização do programa.
+Ao final, quando o estado do objeto vinculado ao ciclo for reconhecido como "inativo" ou "morto", então não será realizada uma nova execução, e será feita uma chamada para uma função pelo campo `EXECUTE` ao fim do loop, nesse caso nada será executado, evidenciado pela palavra reservada `NULL`. Por fim, `THIS->DIE()` é uma boa prática para finalização do programa.
 
 ## Estrutura da linguagem
 
@@ -45,7 +81,7 @@ Para esta linguagem, o programa e sua execução são considerados entidade e ci
 
 > As palavras chave da linguagem são reconhecidas independente da caixa da letra, ou seja, `int`, é o mesmo que `INT`, que o mesmo que `Int`, etc.
 
-#### Blocos de Ciclo
+### Blocos de Ciclo
 
 No [exemplo 1](#exemplo-1) está um exemplo da estrutura básica de ~ATH. Essa estrutura será chamada `Bloco de ciclo` e possui a estrutura genérica seguinte:
 
@@ -107,7 +143,7 @@ NOME:
 
 Declarações de posse devem possuir nomes consistindo de caracteres alfanuméricos maiúsculos ou maiúsculos ([a-zA-Z0-9]), undersecore (_) ou til (\~), podendo ser iniciadas apenas por letras ou til. Não é permitido a redeclaração de posses em uma mesma entidade.
 
-**EXPRESSẼOS** válidas consistem de literais, variáveis, chamadas de ciclos ou operações entre expressões válidas. Também é possível utilizar as palavras-chave `INPUT` e `RETURN` como atribuições de uma posse. `INPUT` indica que esta posse deve será inicializada com um valor fornecida no momento que a entidade for inicializada ou "chamada". Apenas uma posse deve ser atribuida como `RETURN`, e indicará o valor fornecido pela chamada de ciclo.
+**EXPRESSÕES** válidas consistem de literais, variáveis, chamadas de ciclos ou operações entre expressões válidas. Também é possível utilizar as palavras-chave `INPUT` e `RETURN` como atribuições de uma posse. `INPUT` indica que esta posse deve será inicializada com um valor fornecida no momento que a entidade for inicializada ou "chamada". Apenas uma posse deve ser atribuida como `RETURN`, e indicará o valor fornecido pela chamada de ciclo.
 
 ###### Exemplo de Bloco de Posse
 

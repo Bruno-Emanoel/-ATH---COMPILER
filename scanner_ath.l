@@ -3,10 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Adriano Maia - Para integração com o Bison/Yacc, os tokens seriam definidos 
-   em um arquivo de cabeçalho compartilhado (ex y.tab.h). 
-   Por enquanto, definimos aqui. */
-
 typedef enum {
     T_ATH        = 258,
     T_EXECUTE    = 259,
@@ -72,10 +68,6 @@ typedef enum {
     T_EOF        = 309,
     T_UNKNOWN    = 310
 } TokenType;
-
-/* yylval é a variável global usada pelo Flex e Bison para trocar 
-   valores. Em um compilador real, isso seria uma 'union' para 
-   suportar diferentes tipos de dados (inteiros, strings, etc.). */
 
 int yylval;
 
