@@ -1,73 +1,9 @@
 /* Seção de Definições em C */
 %{
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-typedef enum {
-    T_ATH        = 258,
-    T_EXECUTE    = 259,
-    T_THIS       = 260,
-    T_SELF       = 261,
-    T_NULL       = 262,
-    T_IMPORT     = 263,
-    T_LEND       = 264,
-    T_INPUT      = 265,
-    T_RETURN     = 266,
-
-    // KW = KEYWORD
-    T_KW_ENTITY  = 267,
-    T_KW_INT     = 268,
-    T_KW_FLOAT   = 269,
-    T_KW_CHAR    = 270,
-    T_KW_STRING  = 271,
-    T_KW_ARRAY   = 272,
-
-    // OP = OPERATOR
-    T_OP_ADD     = 273,
-    T_OP_SUB     = 274,
-    T_OP_MUL     = 275,
-    T_OP_DIV     = 276,
-    T_OP_ATRIB   = 277,
-    T_OP_SUMATB  = 278,
-    T_OP_SUBATB  = 279,
-    T_OP_MULATB  = 280,
-    T_OP_DIVATB  = 281, 
-    T_OP_ISEQU   = 282,
-    T_OP_NOTEQ   = 283,
-    T_OP_GREATER = 284,
-    T_OP_LESSER  = 285,
-    T_OP_GRTEQU  = 286,
-    T_OP_LSSEQU  = 287,
-    T_OP_INC     = 288,
-    T_OP_DEC     = 289,
-    T_OP_AND     = 290,
-    T_OP_OR      = 291,
-    T_OP_NOT     = 292,
-    T_OP_XOR     = 293,
-    T_OP_ACCESS  = 294,
-
-    // Separators
-    T_SP_SMCOLON = 295,
-    T_SP_COLON   = 296,
-    T_SP_COMMA   = 297,
-    T_SP_PARENTESESLFT = 298,
-    T_SP_PARENTESESRGT = 299,
-    T_SP_BRACKETSLFT   = 300,
-    T_SP_BRACKETSRGT   = 301,
-    T_SP_BRACESLFT     = 302,
-    T_SP_BRACESRGT     = 303,
-
-    T_ID = 304,
-    
-    // Literais
-    T_INTEGER    = 305,
-    T_FLOAT      = 306,
-    T_CHAR       = 307,
-    T_STRING     = 308,
-    
-    T_EOF        = 309,
-    T_UNKNOWN    = 310
-} TokenType;
+#include "parser_ath.tab.c"  
 
 int yylval;
 
@@ -183,7 +119,12 @@ STRING_LITERAL    \"[^"\n]*\"
 %%
 /* Seção de Código do Usuário */
 
+int yywrap() {
+  return 1;
+}
+
 // Função main para testar o scanner de forma independente
+/*
 int main(int argc, char **argv) {
     if (argc > 1) {
         FILE *file = fopen(argv[1], "r");
@@ -358,3 +299,4 @@ int main(int argc, char **argv) {
     return 0;
 
 }
+*/
