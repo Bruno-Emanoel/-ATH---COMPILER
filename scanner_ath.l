@@ -68,6 +68,7 @@ STRING_LITERAL    \"[^"\n]*\"
 [aA][rR][rR][aA][yY]           { return T_KW_ARRAY; }
 [iI][nN][tT]                   { return T_KW_INT; }
 [fF][lL][Oo][aA][tT]           { return T_KW_FLOAT; }
+[aA][sS]                       { return T_AS; }
 
 {FLOAT}        { yylval = atof(yytext); return T_FLOAT; }
 {INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
