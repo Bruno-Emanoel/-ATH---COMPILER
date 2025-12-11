@@ -1,5 +1,6 @@
 /* Seção de Definições em C */
 %{
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "parser_ath.tab.c" 
@@ -63,6 +64,7 @@ STRING_LITERAL    \"[^"\n]*\"
 [aA][rR][rR][aA][yY]           { return T_KW_ARRAY; }
 [iI][nN][tT]                   { return T_KW_INT; }
 [fF][lL][Oo][aA][tT]           { return T_KW_FLOAT; }
+[aA][sS]                       { return T_AS; }
 
 {FLOAT}        { yylval.fval = atof(yytext); return T_FLOAT; }
 {INTEIRO}      { yylval.ival = atoi(yytext); return T_INTEGER; }
@@ -114,7 +116,12 @@ STRING_LITERAL    \"[^"\n]*\"
 %%
 /* Seção de Código do Usuário */
 
+int yywrap() {
+  return 1;
+}
+
 // Função main para testar o scanner de forma independente
+/*
 int main(int argc, char **argv) {
     if (argc > 1) {
         FILE *file = fopen(argv[1], "r");
@@ -289,3 +296,4 @@ int main(int argc, char **argv) {
     return 0;
 
 }
+*/
