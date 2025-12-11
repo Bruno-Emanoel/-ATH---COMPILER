@@ -2,74 +2,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
-
-typedef enum {
-    T_ATH        = 258,
-    T_EXECUTE    = 259,
-    T_THIS       = 260,
-    T_SELF       = 261,
-    T_NULL       = 262,
-    T_IMPORT     = 263,
-    T_LEND       = 264,
-    T_INPUT      = 265,
-    T_RETURN     = 266,
-
-    // KW = KEYWORD
-    T_KW_ENTITY  = 267,
-    T_KW_INT     = 268,
-    T_KW_FLOAT   = 269,
-    T_KW_CHAR    = 270,
-    T_KW_STRING  = 271,
-    T_KW_ARRAY   = 272,
-
-    // OP = OPERATOR
-    T_OP_ADD     = 273,
-    T_OP_SUB     = 274,
-    T_OP_MUL     = 275,
-    T_OP_DIV     = 276,
-    T_OP_ATRIB   = 277,
-    T_OP_SUMATB  = 278,
-    T_OP_SUBATB  = 279,
-    T_OP_MULATB  = 280,
-    T_OP_DIVATB  = 281, 
-    T_OP_ISEQU   = 282,
-    T_OP_NOTEQ   = 283,
-    T_OP_GREATER = 284,
-    T_OP_LESSER  = 285,
-    T_OP_GRTEQU  = 286,
-    T_OP_LSSEQU  = 287,
-    T_OP_INC     = 288,
-    T_OP_DEC     = 289,
-    T_OP_AND     = 290,
-    T_OP_OR      = 291,
-    T_OP_NOT     = 292,
-    T_OP_XOR     = 293,
-    T_OP_ACCESS  = 294,
-
-    // Separators
-    T_SP_SMCOLON = 295,
-    T_SP_COLON   = 296,
-    T_SP_COMMA   = 297,
-    T_SP_PARENTESESLFT = 298,
-    T_SP_PARENTESESRGT = 299,
-    T_SP_BRACKETSLFT   = 300,
-    T_SP_BRACKETSRGT   = 301,
-    T_SP_BRACESLFT     = 302,
-    T_SP_BRACESRGT     = 303,
-
-    T_ID = 304,
-    
-    // Literais
-    T_INTEGER    = 305,
-    T_FLOAT      = 306,
-    T_CHAR       = 307,
-    T_STRING     = 308,
-    
-    T_EOF        = 309,
-    T_UNKNOWN    = 310
-} TokenType;
-
-int yylval;
+#include "parser_ath.tab.c" 
 
 /* Tabela de Símbolos (baseada em table.l) */
 #define MAX_SYMBOLS 100
@@ -92,8 +25,6 @@ int get_symbol_position(const char *id) {
 }
 %}
 
-/* Opções do Flex */
-%option noyywrap
 
 /* Definições de Expressões Regulares (apelidos) */
 DIGITO            [0-9]
@@ -110,7 +41,7 @@ CHAR_LITERAL      \'\\?[^']\'
 STRING_ABERTA     \"[^"\n]*\n
 STRING_LITERAL    \"[^"\n]*\"
 
-/* Seção de Regras */
+/* "Seção de Regras */
 %%
 [\0 \r\t]+         { /* Ignorar espaços em branco e tabulações */ }
 \n             { line_count++; }
@@ -133,14 +64,14 @@ STRING_LITERAL    \"[^"\n]*\"
 [iI][nN][tT]                   { return T_KW_INT; }
 [fF][lL][Oo][aA][tT]           { return T_KW_FLOAT; }
 
-{FLOAT}        { yylval = atof(yytext); return T_FLOAT; }
-{INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
-{CHAR_LITERAL} { return T_CHAR; }
+{FLOAT}        { yylval.fval = atof(yytext); return T_FLOAT; }
+{INTEIRO}      { yylval.ival = atoi(yytext); return T_INTEGER; }
+{CHAR_LITERAL} { yylval.name = yytext; return T_CHAR; }
 {STRING_ABERTA}  { printf("\nErro Léxico na linha %d String não terminada %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
-{STRING_LITERAL} { return T_STRING; }
+{STRING_LITERAL} { yylval.name = yytext; return T_STRING; }
 
 {ID_INVALIDO}  { printf("\nErro Léxico na linha %d Identificador inválido: %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
-{ID}           { yylval = get_symbol_position(yytext); return T_ID; }
+{ID}           { yylval.name = (yytext); return T_ID; }
 
 "=="           { return T_OP_ISEQU; }
 "!="           { return T_OP_NOTEQ; }
