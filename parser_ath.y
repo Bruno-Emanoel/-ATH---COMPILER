@@ -19,7 +19,8 @@ struct Node {
 
 Node *makeNode(char *name, Node **childs, int childCnt) {
     Node *novo = malloc(sizeof(Node));
-    novo->value = name;
+    novo->value = malloc(sizeof(char)*30);
+    strcpy(novo->value, name);
     novo->child = childs;
     novo->childCnt = childCnt;
     return novo;
@@ -31,10 +32,18 @@ void populate(Node **child, Node **list, int size) {
   }
 }
 
-#define MAKECHILD(num) {Node **child; if(num) child = malloc(sizeof(Node)*num);}
-#define POPULATECHILD(list, size) {Node **aux = list; populate(child,aux,size);}
-#define NODEFY(name, list, size) {  MAKECHILD(size);  POPULATECHILD(list,size);  $$ = makeNode(name,child,size); }
 #define NULLCHILD NULL,0
+#define $$ yyval.node
+#define MAKECHILD Node **child = NULL;
+#define ALLOCCHILD(num) { if(num) child = malloc(sizeof(Node*)*num); }
+#define POPULATECHILD(size, ...) {Node *aux[] = {__VA_ARGS__}; populate(child,aux,size);}
+#define NODEFY(name, size, ...) {  \
+        MAKECHILD; \
+        ALLOCCHILD(size);  \
+        POPULATECHILD(size,__VA_ARGS__);  \
+        $$ = makeNode(name,child,size); \
+}
+#define SINGLENODEFY(name) $$ = makeNode(name,NULLCHILD)
 
 /* --- CÓDIGO DA TABELA DE SÍMBOLOS --- */
 #define TAM_TABELA 100
@@ -48,7 +57,7 @@ int indice_tabela = 0;
 struct simbolo* buscar(char *nome) {
     for (int i = 0; i < indice_tabela; i++) {
         if (strcmp(tabela_simbolos[i].nome, nome) == 0) {
-            return &tabela_simbolos[i];666666666666666666663333333333333333333333333333333333333
+            return &tabela_simbolos[i];
         }
     }
     return NULL;
@@ -82,17 +91,30 @@ void imprimir_tabela() {
     }
     printf("--------------------------\n");
 }
+
+void imprimir_arvore(Node *node, int deepnes) {
+    for(int i = 0; i < deepnes; i++) {
+        putchar('\t');
+    }
+    printf("%s\n",node->value);
+    for(int i = 0; i < node->childCnt; i++) {
+        if(node->child[i]!=NULL)
+            imprimir_arvore(node->child[i],deepnes+1);
+    }
+    free(node->value);
+    if(node->childCnt)
+        free(node->child);
+}
+
+Node *root;
 %}
 
 /* --- DEFINIÇÕES BISON --- */
 %union {
     int ival;
     double fval; 
-    char *name;
+    char name[100];
     Node *node;
-}
-
-%union {
 }
 
 %token T_ATH T_EXECUTE T_THIS T_SELF T_NULL T_IMPORT T_LEND T_INPUT T_RETURN T_AS
@@ -126,10 +148,12 @@ void imprimir_tabela() {
 
 %start program
 %type <node> program importList import importDeclaration multImportDeclaration 
-%type <node> entityBlock entityDeclaration
+%type <node> entityBlock entityDeclaration optionalExpression
 %type <node> possessionList possesion possesionDeclaration
-%type <node> typeName expression term unitaryOperator operator terminal
-%type <node> cycleBlock cycleTerminator
+%type <node> declarationInitialization sizeList sizeInitialization
+%type <node> typeName expression term indexing unitaryOperator operator terminal optionalSemicolon
+%type <node> call composition parameter parameterList
+%type <node> cycleBlock optionalCycleBlock cycleTerminator
 
 %%
 /*import unitário
@@ -138,137 +162,194 @@ posse normal (declaração de variável)
 entidade de posse (nome: entidade)
 Bloco de entidade*/
 program:
-    importList entityBlock {NODEFY("program", {$1, $2}, 2);}
+    importList entityBlock {NODEFY("program", 2, $1, $2); root = $$; }
     ;
 
 importList: { $$ = NULL;}|
-    importList import {NODEFY("importList", {$1, $2}, 2);}
+    importList import {NODEFY("importList", 2, $1, $2);}
     ;
     
 import:
-    T_IMPORT importDeclaration T_SP_SMCOLON {NODEFY("import", {makeNode("IMPORT", NULLCHILD), $2, makeNode(";", NULLCHILD)}, 3);}
-    | T_IMPORT importDeclaration T_SP_BRACKETSLFT multImportDeclaration T_SP_BRACESRGT T_SP_SMCOLON {NODEFY("import", {makeNode("IMPORT", NULLCHILD), $2, makeNode("{", NULLCHILD), $4, makeNode("}", NULLCHILD), makeNode(";", NULLCHILD)}, 6);}
-    | T_IMPORT T_STRING T_SP_SMCOLON {NODEFY("import", {makeNode("IMPORT", NULLCHILD), makeNode($2, NULLCHILD), makeNode(";", NULLCHILD)}, 3);}
-    | T_IMPORT T_STRING T_AS T_ID T_SP_SMCOLON {NODEFY("import", {makeNode("IMPORT", NULLCHILD), makeNode(strcpy($2), NULLCHILD), makeNode("AS", NULLCHILD), makeNode($4, NULLCHILD), makeNode(";", NULLCHILLD)}, 5);}
+    T_IMPORT importDeclaration T_SP_SMCOLON {NODEFY("import", 3, makeNode("IMPORT", NULLCHILD), $2, makeNode(";", NULLCHILD));}
+    | T_IMPORT importDeclaration T_SP_BRACKETSLFT multImportDeclaration T_SP_BRACKETSRGT T_SP_SMCOLON {NODEFY("import", 6, makeNode("IMPORT", NULLCHILD), $2, makeNode("{", NULLCHILD), $4, makeNode("}", NULLCHILD), makeNode(";", NULLCHILD));}
+    | T_IMPORT T_STRING T_SP_SMCOLON {NODEFY("import", 3, makeNode("IMPORT", NULLCHILD), makeNode($2, NULLCHILD), makeNode(";", NULLCHILD));}
+    | T_IMPORT T_STRING T_AS T_ID T_SP_SMCOLON {NODEFY("import", 5, makeNode("IMPORT", NULLCHILD), makeNode(($2), NULLCHILD), makeNode("AS", NULLCHILD), makeNode($4, NULLCHILD), makeNode(";", NULLCHILD));}
     ;
 
 importDeclaration:
-    T_ID                { NODEFY("importDeclaration", {makeNode($1,NULLCHILD)}, 1); }
-    | T_ID T_AS T_ID { NODEFY("importDeclaration", {makeNode($1,NULLCHILD), makeNode("AS", NULLCHILD), makeNode($3,NULLCHILD)})}
+    T_ID                { NODEFY("importDeclaration", 1, makeNode($1,NULLCHILD)); }
+    | T_ID T_AS T_ID { NODEFY("importDeclaration", 3, makeNode($1,NULLCHILD), makeNode("AS", NULLCHILD), makeNode($3,NULLCHILD)); }
     ;
 
 multImportDeclaration:
-    importDeclaration T_SP_COMMA multImportDeclaration {NODEFY("multImportDeclaration", {$1, makeNode(",", NULLCHILD), $3}, 3);}
-    | importDeclaration T_SP_COMMA importDeclaration {NODEFY("multImportDeclaration", {$1, makeNode(",", NULLCHILD), $3}, 3);}
-    | importDeclaration {NODEFY("multmportDeclaration", {$1}, 1);}
+    importDeclaration T_SP_COMMA multImportDeclaration {NODEFY("multImportDeclaration", 3, $1, makeNode(",", NULLCHILD), $3);}
+    | importDeclaration {NODEFY("multmportDeclaration", 1, $1);}
     ;
 
 entityBlock:
-    possessionList cycleBlock { NODEFY("entityBlock", {$1, $2}, 2); }
+    possessionList cycleBlock { NODEFY("entityBlock", 2, $1, $2); }
     ;
     
 entityDeclaration: 
-    T_ID T_SP_COLON entityBlock { NODEFY("entityDeclaration", {makeNode($1), makeNode(":",NULLCHILD), $3}, 3); }
+    T_ID T_SP_COLON entityBlock { NODEFY("entityDeclaration", 3, makeNode($1,NULLCHILD), makeNode(":",NULLCHILD), $3); }
     ;
 
-possessionList:  { $$ = NULL; }|
-    possessionList possesion { NODEFY("possessionList", {$1, $2}, 2); }
+possessionList:  { $$ = NULL; } |
+    possessionList possesion { NODEFY("possessionList", 2, $1, $2); }
     ;
 
 possesion: 
-    entityDeclaration       { NODEFY("possession", {$1}, 1); } | 
-    possesionDeclaration    { NODEFY("possession", {$1}, 1); }
+    entityDeclaration       { NODEFY("possession", 1, $1); } | 
+    possesionDeclaration    { NODEFY("possession", 1, $1); }
     ;
 
 
 possesionDeclaration:
-    typeName T_ID T_OP_ATRIB expression T_SP_SMCOLON { NODEFY("possessionDeclaration", {$1, makeNode(strcpy($2),NULLCHILD), makeNode("=",NULLCHILD), $4, makeNode(";",NULLCHILD)},5); }
+    typeName T_ID declarationInitialization T_SP_SMCOLON { NODEFY("possessionDeclaration", 4, $1, makeNode(($2),NULLCHILD), $3, makeNode(";",NULLCHILD)); }
     ;
-       
+
+declarationInitialization:
+    T_OP_ATRIB expression { NODEFY("declarationInitialization", 2, makeNode("=",NULLCHILD), $2);} |
+    sizeList    { NODEFY("declarationInitialization", 1, $1); }
+    ;
+
+sizeList: { $$ = NULL; } |
+    sizeList sizeInitialization { NODEFY("sizeList", 2, $1, $2); }
+    ;
+
+sizeInitialization:
+    T_SP_BRACESLFT expression T_SP_BRACESRGT { NODEFY("sizeInitialization", 3, makeNode("[",NULLCHILD), $2, makeNode("]",NULLCHILD)); }
+    ;  
 
 typeName: 
-    T_KW_ENTITY { NODEFY("ENTITY",NULLCHILD); }|
-    T_KW_INT    { NODEFY("INT",NULLCHILD); }|
-    T_KW_FLOAT  { NODEFY("FLOAT",NULLCHILD); }|
-    T_KW_CHAR   { NODEFY("CHAR",NULLCHILD); }|
-    T_KW_STRING { NODEFY("STRING",NULLCHILD); }|
-    T_KW_ARRAY { NODEFY("ARRAY",NULLCHILD); }
+    T_KW_INT                                            { SINGLENODEFY("INT"); }    |
+    T_KW_FLOAT                                          { SINGLENODEFY("FLOAT"); }  |
+    T_KW_CHAR                                           { SINGLENODEFY("CHAR"); }   |
+    T_KW_STRING                                         { SINGLENODEFY("STRING"); } |
+    T_KW_ARRAY T_SP_BRACESLFT typeName T_SP_BRACESRGT   { NODEFY("typeName", 4, makeNode("ARRAY", NULLCHILD), makeNode("[", NULLCHILD), $3, makeNode("]", NULLCHILD));} |
+    T_KW_ENTITY T_SP_BRACESLFT T_ID T_SP_BRACESRGT      { NODEFY("typeName", 4, makeNode("ENTITY", NULLCHILD), makeNode("[", NULLCHILD), makeNode($3, NULLCHILD), makeNode("]", NULLCHILD));}
     ;
 
 expression: 
-    term                        { NODEFY("expression", {$1}, 1); } | 
-    unitaryOperator expression  { NODEFY("expression", {$1,$2}, 2); } | 
-    term operator expression    { NODEFY("expression", {$1,$2,$3}, 3); }
+    term                        { NODEFY("expression", 1, $1); }        | 
+    unitaryOperator expression  { NODEFY("expression", 2, $1, $2); }    | 
+    term operator expression    { NODEFY("expression", 3, $1, $2, $3); }|
+    call                        { NODEFY("expression", 1, $1); }        |
+    composition                 { NODEFY("expression", 1, $1); }        |
+    T_SP_BRACESLFT parameterList T_SP_BRACESRGT  { NODEFY("expression", 3, makeNode("[", NULLCHILD), $2, makeNode("]", NULLCHILD));}
+    ;
+
+call:
+    T_ID T_SP_PARENTESESLFT parameterList T_SP_PARENTESESRGT  {NODEFY("call", 4, makeNode($1, NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD));}
+    ;
+
+composition:
+    T_ID T_SP_BRACKETSLFT parameterList T_SP_BRACKETSRGT {NODEFY("composition", 4, makeNode($1, NULLCHILD), makeNode("{", NULLCHILD), $3, makeNode("}", NULLCHILD));}
+    ;
+
+parameter:
+    T_LEND T_ID {NODEFY("parameter", 2, makeNode("LEND", NULLCHILD), makeNode($2, NULLCHILD));}|
+    expression {NODEFY("parameter", 1, $1)}
+    ;
+
+parameterList: { $$ = NULL; }|
+    parameterList T_SP_COMMA parameter {NODEFY("parameterList", 3, $1, makeNode(",", NULLCHILD), $3);}|
+    parameter {NODEFY("parameter", 1, $1)}
+    ;
+
+indexing:
+    term T_SP_BRACESLFT expression T_SP_BRACESRGT { NODEFY("indexing", 4, $1, makeNode("[", NULLCHILD), $3, makeNode("]", NULLCHILD));}
+    ;
+
+
+optionalExpression: { $$ = NULL; } |
+    expression {NODEFY("optionalExpression", 1, $1);}
     ;
     
 term:
-    term operator terminal                           { NODEFY("term", {$1,$2,$3}, 3); } | 
-    T_SP_PARENTESESLFT expression T_SP_PARENTESESLFT { NODEFY("term", {makeNode("(",NULLCHILD),$2,makeNode(")",NULLCHILD)}); } | 
-    terminal                                         { NODEFY("term", {$1}, 1); }
+    T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT { NODEFY("term", 3, makeNode("(",NULLCHILD),$2,makeNode(")",NULLCHILD)); } | 
+    terminal                                         { NODEFY("term", 1, $1); } |
+    indexing                    { NODEFY("expression", 1, $1); }
     ;       
 
-terminal: T_FLOAT {
+terminal: 
+    T_FLOAT {
         char *s = malloc(50);
         sprintf(s,"%f",$1);
-        NODEFY(s, NULLCHILD);
+        SINGLENODEFY(s);
     } | 
     T_INTEGER {
         char *s = malloc(50);
         sprintf(s,"%d",$1);
-        NODEFY(s, NULLCHILD);
+        SINGLENODEFY(s);
     } | 
-    T_ID {NODEFY(strcpy($1), NULLCHILD);} | 
-    T_CHAR {NODEFY(strcpy($1), NULLCHILD);} | 
-    T_STRING {NODEFY(strcpy($1), NULLCHILD);}
+    T_ID {SINGLENODEFY(($1));} | 
+    T_CHAR {SINGLENODEFY(($1));} | 
+    T_STRING {SINGLENODEFY(($1));} |
+    T_NULL   { SINGLENODEFY("NULL"); } |
+    T_RETURN { SINGLENODEFY("RETURN"); } |
+    T_INPUT  { SINGLENODEFY("INPUT"); }
     ;
 
 unitaryOperator:
-        T_OP_NOT {NODEFY("!", NULLCHILD);}
-        | T_OP_DEC {NODEFY("--", NULLCHILD);}
-        | T_OP_INC {NODEFY("++", NULLCHILD);}
+        T_OP_NOT {SINGLENODEFY("!");}
+        | T_OP_DEC {SINGLENODEFY("--");}
+        | T_OP_INC {SINGLENODEFY("++");}
         ;
 operator:
-    T_OP_ADD {NODEFY("+", NULLCHILD);}
-    | T_OP_AND {NODEFY("&&", NULLCHILD);}
-    | T_OP_DIV {NODEFY("/", NULLCHILD);}
-    | T_OP_GREATER {NODEFY(">", NULLCHILD);}
-    | T_OP_GRTEQU {NODEFY(">=", NULLCHILD);}
-    | T_OP_DIVATB {NODEFY("/=", NULLCHILD);}
-    | T_OP_ISEQU {NODEFY("==", NULLCHILD);}
-    | T_OP_LESSER {NODEFY("<", NULLCHILD);}
-    | T_OP_LSSEQU {NODEFY("<=", NULLCHILD);}
-    | T_OP_MUL {NODEFY("*", NULLCHILD);}
-    | T_OP_MULATB {NODEFY("*=", NULLCHILD);}
-    | T_OP_NOTEQ {NODEFY("!=", NULLCHILD);}
-    | T_OP_OR {NODEFY("||", NULLCHILD);}
-    | T_OP_SUB {NODEFY("-", NULLCHILD);}
-    | T_OP_SUBATB {NODEFY("-=", NULLCHILD);}
-    | T_OP_SUMATB {NODEFY("+=", NULLCHILD);}
-    | T_OP_XOR {NODEFY("^^", NULLCHILD);}
-    | T_OP_ATRIB {NODEFY("=", NULLCHILD);}
+    T_OP_ADD        { SINGLENODEFY("+");  }
+    | T_OP_AND      { SINGLENODEFY("&&"); }
+    | T_OP_DIV      { SINGLENODEFY("/");  }
+    | T_OP_GREATER  { SINGLENODEFY(">");  }
+    | T_OP_GRTEQU   { SINGLENODEFY(">="); }
+    | T_OP_DIVATB   { SINGLENODEFY("/="); }
+    | T_OP_ISEQU    { SINGLENODEFY("=="); }
+    | T_OP_LESSER   { SINGLENODEFY("<");  }
+    | T_OP_LSSEQU   { SINGLENODEFY("<="); }
+    | T_OP_MUL      { SINGLENODEFY("*");  }
+    | T_OP_MULATB   { SINGLENODEFY("*="); }
+    | T_OP_NOTEQ    { SINGLENODEFY("!="); }
+    | T_OP_OR       { SINGLENODEFY("||"); }
+    | T_OP_SUB      { SINGLENODEFY("-");  }
+    | T_OP_SUBATB   { SINGLENODEFY("-="); }
+    | T_OP_SUMATB   { SINGLENODEFY("+="); }
+    | T_OP_XOR      { SINGLENODEFY("^^"); }
+| T_OP_ATRIB        { SINGLENODEFY("=");  }
     ;
  
-cycleBlock: { $$ = NULL; }| 
-    T_ATH T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_BRACKETSLFT 
-    cycleBlock T_SP_BRACKETSRGT T_EXECUTE T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_SMCOLON
-    cycleTerminator {NODEFY("cycleBlock", {makeNode("~ATH", NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD), makeNode("{", NULLCHILD), $6, makeNode("}", NULLCHILD), makeNode("EXECUTE", NULLCHILD), makeNode("(", NULLCHILD), $10, makeNode(")", NULLCHILD), makeNode(";", NULLCHILD), $13}, 13);}
+cycleBlock: 
+    T_ATH T_SP_PARENTESESLFT optionalExpression T_SP_PARENTESESRGT T_SP_BRACKETSLFT 
+    optionalCycleBlock T_SP_BRACKETSRGT T_EXECUTE T_SP_PARENTESESLFT expression optionalSemicolon T_SP_PARENTESESRGT T_SP_SMCOLON
+    cycleTerminator {NODEFY("cycleBlock", 14, makeNode("~ATH", NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD), makeNode("{", NULLCHILD), $6, makeNode("}", NULLCHILD), makeNode("EXECUTE", NULLCHILD), makeNode("(", NULLCHILD), $10, $11, makeNode(")", NULLCHILD), makeNode(";", NULLCHILD), $14);}
             ;
 
+optionalCycleBlock: { $$ = NULL; } |
+    cycleBlock { NODEFY("optionalCycleBlock", 1, $1); }
+
+
+optionalSemicolon : { $$ = NULL; }|
+    T_SP_SMCOLON {SINGLENODEFY(";");}
+    ;
 cycleTerminator: { $$ = NULL; } |
-    T_THIS T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON      { NODEFY("cycleTerminator", {makeNode("THIS", NULLCHILD), makeNode("->", NULLCHILD), makeNode(strcpy($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)}, 6); }
-    | T_SELF T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON    { NODEFY("cycleTerminator", {makeNode("SELF", NULLCHILD), makeNode("->", NULLCHILD), makeNode(strcpy($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)}, 6); }
+    T_THIS T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON      { NODEFY("cycleTerminator", 6, makeNode("THIS", NULLCHILD), makeNode("->", NULLCHILD), makeNode(($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)); }
+    | T_SELF T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON    { NODEFY("cycleTerminator", 6, makeNode("SELF", NULLCHILD), makeNode("->", NULLCHILD), makeNode(($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)); }
     ;
 
 %%
 /* --- CÓDIGO C ADICIONAL --- */
 int main() {
-    return yyparse();
+    if(yyparse()==0) {
+        imprimir_arvore(root,0);
+        return 0;
+    }
+    return -1;
 }
 
 int yyerror(char *s) {
     if (strcmp(s, "syntax error") == 0) {
         fprintf(stderr, "Que vacilo! (Erro de sintaxe)\n");
     } else {
+        fprintf(stderr, "Algum erro aconteceu.");
         fprintf(stderr, "%s\n", s);
     }
     return 0;

@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "parser_ath.tab.c"  
-
-int yylval;
+#include "parser_ath.tab.c" 
 
 /* Tabela de Símbolos (baseada em table.l) */
 #define MAX_SYMBOLS 100
@@ -28,8 +26,6 @@ int get_symbol_position(const char *id) {
 }
 %}
 
-/* Opções do Flex */
-%option noyywrap
 
 /* Definições de Expressões Regulares (apelidos) */
 DIGITO            [0-9]
@@ -46,7 +42,7 @@ CHAR_LITERAL      \'\\?[^']\'
 STRING_ABERTA     \"[^"\n]*\n
 STRING_LITERAL    \"[^"\n]*\"
 
-/* Seção de Regras */
+/* "Seção de Regras */
 %%
 [\0 \r\t]+         { /* Ignorar espaços em branco e tabulações */ }
 \n             { line_count++; }
@@ -70,14 +66,14 @@ STRING_LITERAL    \"[^"\n]*\"
 [fF][lL][Oo][aA][tT]           { return T_KW_FLOAT; }
 [aA][sS]                       { return T_AS; }
 
-{FLOAT}        { yylval = atof(yytext); return T_FLOAT; }
-{INTEIRO}      { yylval = atoi(yytext); return T_INTEGER; }
-{CHAR_LITERAL} { return T_CHAR; }
+{FLOAT}        { yylval.fval = atof(yytext); return T_FLOAT; }
+{INTEIRO}      { yylval.ival = atoi(yytext); return T_INTEGER; }
+{CHAR_LITERAL} { strcpy(yylval.name, yytext); return T_CHAR; }
 {STRING_ABERTA}  { printf("\nErro Léxico na linha %d String não terminada %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
-{STRING_LITERAL} { return T_STRING; }
+{STRING_LITERAL} { strcpy(yylval.name, yytext); return T_STRING; }
 
 {ID_INVALIDO}  { printf("\nErro Léxico na linha %d Identificador inválido: %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
-{ID}           { yylval = get_symbol_position(yytext); return T_ID; }
+{ID}           { strcpy(yylval.name,(yytext)); return T_ID; }
 
 "=="           { return T_OP_ISEQU; }
 "!="           { return T_OP_NOTEQ; }

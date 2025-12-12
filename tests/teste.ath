@@ -1,0 +1,7 @@
+int a = 1;
+
+~ATH(NULL){
+  ~ATH(NULL) {} EXECUTE(NULL);
+} EXECUTE(NULL);
+
+THIS->DIE();
