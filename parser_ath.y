@@ -113,7 +113,7 @@ Node *root;
 %union {
     int ival;
     double fval; 
-    char *name;
+    char name[100];
     Node *node;
 }
 
@@ -148,9 +148,11 @@ Node *root;
 
 %start program
 %type <node> program importList import importDeclaration multImportDeclaration 
-%type <node> entityBlock entityDeclaration
+%type <node> entityBlock entityDeclaration optionalExpression
 %type <node> possessionList possesion possesionDeclaration
-%type <node> typeName expression term unitaryOperator operator terminal
+%type <node> declarationInitialization sizeList sizeInitialization
+%type <node> typeName expression term indexing unitaryOperator operator terminal optionalSemicolon
+%type <node> call composition parameter parameterList
 %type <node> cycleBlock optionalCycleBlock cycleTerminator
 
 %%
@@ -169,7 +171,7 @@ importList: { $$ = NULL;}|
     
 import:
     T_IMPORT importDeclaration T_SP_SMCOLON {NODEFY("import", 3, makeNode("IMPORT", NULLCHILD), $2, makeNode(";", NULLCHILD));}
-    | T_IMPORT importDeclaration T_SP_BRACKETSLFT multImportDeclaration T_SP_BRACESRGT T_SP_SMCOLON {NODEFY("import", 6, makeNode("IMPORT", NULLCHILD), $2, makeNode("{", NULLCHILD), $4, makeNode("}", NULLCHILD), makeNode(";", NULLCHILD));}
+    | T_IMPORT importDeclaration T_SP_BRACKETSLFT multImportDeclaration T_SP_BRACKETSRGT T_SP_SMCOLON {NODEFY("import", 6, makeNode("IMPORT", NULLCHILD), $2, makeNode("{", NULLCHILD), $4, makeNode("}", NULLCHILD), makeNode(";", NULLCHILD));}
     | T_IMPORT T_STRING T_SP_SMCOLON {NODEFY("import", 3, makeNode("IMPORT", NULLCHILD), makeNode($2, NULLCHILD), makeNode(";", NULLCHILD));}
     | T_IMPORT T_STRING T_AS T_ID T_SP_SMCOLON {NODEFY("import", 5, makeNode("IMPORT", NULLCHILD), makeNode(($2), NULLCHILD), makeNode("AS", NULLCHILD), makeNode($4, NULLCHILD), makeNode(";", NULLCHILD));}
     ;
@@ -192,7 +194,7 @@ entityDeclaration:
     T_ID T_SP_COLON entityBlock { NODEFY("entityDeclaration", 3, makeNode($1,NULLCHILD), makeNode(":",NULLCHILD), $3); }
     ;
 
-possessionList:  { $$ = NULL; }|
+possessionList:  { $$ = NULL; } |
     possessionList possesion { NODEFY("possessionList", 2, $1, $2); }
     ;
 
@@ -203,31 +205,75 @@ possesion:
 
 
 possesionDeclaration:
-    typeName T_ID T_OP_ATRIB expression T_SP_SMCOLON { NODEFY("possessionDeclaration", 5, $1, makeNode(($2),NULLCHILD), makeNode("=",NULLCHILD), $4, makeNode(";",NULLCHILD)); }
+    typeName T_ID declarationInitialization T_SP_SMCOLON { NODEFY("possessionDeclaration", 4, $1, makeNode(($2),NULLCHILD), $3, makeNode(";",NULLCHILD)); }
     ;
-       
+
+declarationInitialization:
+    T_OP_ATRIB expression { NODEFY("declarationInitialization", 2, makeNode("=",NULLCHILD), $2);} |
+    sizeList    { NODEFY("declarationInitialization", 1, $1); }
+    ;
+
+sizeList: { $$ = NULL; } |
+    sizeList sizeInitialization { NODEFY("sizeList", 2, $1, $2); }
+    ;
+
+sizeInitialization:
+    T_SP_BRACESLFT expression T_SP_BRACESRGT { NODEFY("sizeInitialization", 3, makeNode("[",NULLCHILD), $2, makeNode("]",NULLCHILD)); }
+    ;  
 
 typeName: 
-    T_KW_ENTITY { SINGLENODEFY("ENTITY"); } |
-    T_KW_INT    { SINGLENODEFY("INT"); }    |
-    T_KW_FLOAT  { SINGLENODEFY("FLOAT"); }  |
-    T_KW_CHAR   { SINGLENODEFY("CHAR"); }   |
-    T_KW_STRING { SINGLENODEFY("STRING"); } |
-    T_KW_ARRAY  { SINGLENODEFY("ARRAY"); }
+    T_KW_INT                                            { SINGLENODEFY("INT"); }    |
+    T_KW_FLOAT                                          { SINGLENODEFY("FLOAT"); }  |
+    T_KW_CHAR                                           { SINGLENODEFY("CHAR"); }   |
+    T_KW_STRING                                         { SINGLENODEFY("STRING"); } |
+    T_KW_ARRAY T_SP_BRACESLFT typeName T_SP_BRACESRGT   { NODEFY("typeName", 4, makeNode("ARRAY", NULLCHILD), makeNode("[", NULLCHILD), $3, makeNode("]", NULLCHILD));} |
+    T_KW_ENTITY T_SP_BRACESLFT T_ID T_SP_BRACESRGT      { NODEFY("typeName", 4, makeNode("ENTITY", NULLCHILD), makeNode("[", NULLCHILD), makeNode($3, NULLCHILD), makeNode("]", NULLCHILD));}
     ;
 
 expression: 
     term                        { NODEFY("expression", 1, $1); }        | 
     unitaryOperator expression  { NODEFY("expression", 2, $1, $2); }    | 
-    term operator expression    { NODEFY("expression", 3, $1, $2, $3); }
+    term operator expression    { NODEFY("expression", 3, $1, $2, $3); }|
+    call                        { NODEFY("expression", 1, $1); }        |
+    composition                 { NODEFY("expression", 1, $1); }        |
+    T_SP_BRACESLFT parameterList T_SP_BRACESRGT  { NODEFY("expression", 3, makeNode("[", NULLCHILD), $2, makeNode("]", NULLCHILD));}
+    ;
+
+call:
+    T_ID T_SP_PARENTESESLFT parameterList T_SP_PARENTESESRGT  {NODEFY("call", 4, makeNode($1, NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD));}
+    ;
+
+composition:
+    T_ID T_SP_BRACKETSLFT parameterList T_SP_BRACKETSRGT {NODEFY("composition", 4, makeNode($1, NULLCHILD), makeNode("{", NULLCHILD), $3, makeNode("}", NULLCHILD));}
+    ;
+
+parameter:
+    T_LEND T_ID {NODEFY("parameter", 2, makeNode("LEND", NULLCHILD), makeNode($2, NULLCHILD));}|
+    expression {NODEFY("parameter", 1, $1)}
+    ;
+
+parameterList: { $$ = NULL; }|
+    parameterList T_SP_COMMA parameter {NODEFY("parameterList", 3, $1, makeNode(",", NULLCHILD), $3);}|
+    parameter {NODEFY("parameter", 1, $1)}
+    ;
+
+indexing:
+    term T_SP_BRACESLFT expression T_SP_BRACESRGT { NODEFY("indexing", 4, $1, makeNode("[", NULLCHILD), $3, makeNode("]", NULLCHILD));}
+    ;
+
+
+optionalExpression: { $$ = NULL; } |
+    expression {NODEFY("optionalExpression", 1, $1);}
     ;
     
 term:
-    T_SP_PARENTESESLFT expression T_SP_PARENTESESLFT { NODEFY("term", 3, makeNode("(",NULLCHILD),$2,makeNode(")",NULLCHILD)); } | 
-    terminal                                         { NODEFY("term", 1, $1); }
+    T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT { NODEFY("term", 3, makeNode("(",NULLCHILD),$2,makeNode(")",NULLCHILD)); } | 
+    terminal                                         { NODEFY("term", 1, $1); } |
+    indexing                    { NODEFY("expression", 1, $1); }
     ;       
 
-terminal: T_FLOAT {
+terminal: 
+    T_FLOAT {
         char *s = malloc(50);
         sprintf(s,"%f",$1);
         SINGLENODEFY(s);
@@ -240,7 +286,9 @@ terminal: T_FLOAT {
     T_ID {SINGLENODEFY(($1));} | 
     T_CHAR {SINGLENODEFY(($1));} | 
     T_STRING {SINGLENODEFY(($1));} |
-    T_NULL   { SINGLENODEFY("NULL"); }
+    T_NULL   { SINGLENODEFY("NULL"); } |
+    T_RETURN { SINGLENODEFY("RETURN"); } |
+    T_INPUT  { SINGLENODEFY("INPUT"); }
     ;
 
 unitaryOperator:
@@ -270,14 +318,18 @@ operator:
     ;
  
 cycleBlock: 
-    T_ATH T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_BRACKETSLFT 
-    optionalCycleBlock T_SP_BRACKETSRGT T_EXECUTE T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_SMCOLON
-    cycleTerminator {NODEFY("cycleBlock", 13, makeNode("~ATH", NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD), makeNode("{", NULLCHILD), $6, makeNode("}", NULLCHILD), makeNode("EXECUTE", NULLCHILD), makeNode("(", NULLCHILD), $10, makeNode(")", NULLCHILD), makeNode(";", NULLCHILD), $13);}
+    T_ATH T_SP_PARENTESESLFT optionalExpression T_SP_PARENTESESRGT T_SP_BRACKETSLFT 
+    optionalCycleBlock T_SP_BRACKETSRGT T_EXECUTE T_SP_PARENTESESLFT expression optionalSemicolon T_SP_PARENTESESRGT T_SP_SMCOLON
+    cycleTerminator {NODEFY("cycleBlock", 14, makeNode("~ATH", NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD), makeNode("{", NULLCHILD), $6, makeNode("}", NULLCHILD), makeNode("EXECUTE", NULLCHILD), makeNode("(", NULLCHILD), $10, $11, makeNode(")", NULLCHILD), makeNode(";", NULLCHILD), $14);}
             ;
 
 optionalCycleBlock: { $$ = NULL; } |
     cycleBlock { NODEFY("optionalCycleBlock", 1, $1); }
 
+
+optionalSemicolon : { $$ = NULL; }|
+    T_SP_SMCOLON {SINGLENODEFY(";");}
+    ;
 cycleTerminator: { $$ = NULL; } |
     T_THIS T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON      { NODEFY("cycleTerminator", 6, makeNode("THIS", NULLCHILD), makeNode("->", NULLCHILD), makeNode(($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)); }
     | T_SELF T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON    { NODEFY("cycleTerminator", 6, makeNode("SELF", NULLCHILD), makeNode("->", NULLCHILD), makeNode(($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)); }
@@ -297,6 +349,7 @@ int yyerror(char *s) {
     if (strcmp(s, "syntax error") == 0) {
         fprintf(stderr, "Que vacilo! (Erro de sintaxe)\n");
     } else {
+        fprintf(stderr, "Algum erro aconteceu.");
         fprintf(stderr, "%s\n", s);
     }
     return 0;

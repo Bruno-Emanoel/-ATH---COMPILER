@@ -68,12 +68,12 @@ STRING_LITERAL    \"[^"\n]*\"
 
 {FLOAT}        { yylval.fval = atof(yytext); return T_FLOAT; }
 {INTEIRO}      { yylval.ival = atoi(yytext); return T_INTEGER; }
-{CHAR_LITERAL} { yylval.name = yytext; return T_CHAR; }
+{CHAR_LITERAL} { strcpy(yylval.name, yytext); return T_CHAR; }
 {STRING_ABERTA}  { printf("\nErro Léxico na linha %d String não terminada %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
-{STRING_LITERAL} { yylval.name = yytext; return T_STRING; }
+{STRING_LITERAL} { strcpy(yylval.name, yytext); return T_STRING; }
 
 {ID_INVALIDO}  { printf("\nErro Léxico na linha %d Identificador inválido: %s\n", line_count, yytext); line_count++; return T_UNKNOWN; }
-{ID}           { yylval.name = (yytext); return T_ID; }
+{ID}           { strcpy(yylval.name,(yytext)); return T_ID; }
 
 "=="           { return T_OP_ISEQU; }
 "!="           { return T_OP_NOTEQ; }

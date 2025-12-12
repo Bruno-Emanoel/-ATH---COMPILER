@@ -1,7 +1,7 @@
-String msg = "Olá";
-int num = input();
+entity[String] msg = "Olá";
+int num = input;
 ~ATH(num >= 99){
-    --num^;  
+    --num;  // Erro sintático
     ~ATH(){} EXECUTE ( Print {"Olá user + num});
 } EXECUTE (NULL);
 
