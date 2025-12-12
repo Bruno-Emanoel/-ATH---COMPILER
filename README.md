@@ -43,6 +43,7 @@
     - [Operadores aritméticos](#operadores-aritméticos)
     - [Operadores lógicos](#operadores-lógicos)
     - [Símbolos Especiais](#símbolos-especiais)
+  - [Regras de Produção](#regras-de-producao)
 
 ## Resumo
 
@@ -871,5 +872,190 @@ A(Start) -- ":" --> B((Accept COLLON));
 
 ---
 
+## Regras de Produção
 
+O parser possui regras de derivação bem definidas e sem ambiguidade, seguindo a especificação da linguagem da forma como descrito no na seção [Estrutura da Linguagem](#estrutura-da-linguagem).
 
+A regra inicial é a program, que consiste no bloco de imports e no bloco da entidade principal. O bloco de imports é uma lista de imports válidos, podendo ser vazia. O bloco de entidade é também dividido em dois outros blocos, o de posses e o de ciclo.
+
+As produções podem ser resumidas em:
+
+```
+Program -> ImportBlock EntityBlock 
+
+ImportBlock -> ImportList
+ImportList  -> ε | ImportList SingleImport
+
+EntityBlock -> PossessionList CycleBlock
+PossessionList -> ε | PossessionList Possession
+Possession -> PossessionDeclaration | EntityDeclaration
+
+PossessionDeclaration -> ID : EntityBlock
+
+CycleBlock -> ~ATH ( optionalExpression ) { optionalCycleBlock } EXECUTE ( expression ); optionalCycleTerminator
+```
+
+A estrutura de blocos permite que não haja ambiguidade na linguagem, pois cada bloco de ciclo pertence a apenas uma entidade (a última que foi definida). Essa estrutura permite que diversas estruturas recursivas da linguagem sejam definidas de maneira completamente deterministica.
+
+Abaixo está um exemplo derivação para o [código de exemplo de número 4](./tests/exemplo4.ath).
+
+```
+program
+	importList
+		import
+			IMPORT
+			importDeclaration
+				console
+			{
+			multmportDeclaration
+				importDeclaration
+					Print
+			}
+			;
+	entityBlock
+		possessionList
+			possessionList
+				possessionList
+					possessionList
+						possession
+							possessionDeclaration
+								typeName
+									ARRAY
+									[
+									INT
+									]
+								list1
+								declarationInitialization
+									=
+									expression
+										[
+										parameterList
+											parameterList
+												parameterList
+													parameterList
+														parameter
+															parameter
+																expression
+																	term
+																		1
+														,
+														parameter
+															expression
+																term
+																	2
+													,
+													parameter
+														expression
+															term
+																3
+												,
+												parameter
+													expression
+														term
+															4
+											,
+											parameter
+												expression
+													term
+														5
+										]
+								;
+					possession
+						possessionDeclaration
+							typeName
+								ARRAY
+								[
+								FLOAT
+								]
+							list2
+							declarationInitialization
+								sizeList
+									sizeInitialization
+										[
+										expression
+											term
+												10
+										]
+							;
+				possession
+					possessionDeclaration
+						INT
+						i
+						declarationInitialization
+							=
+							expression
+								term
+									0
+						;
+			possession
+				possessionDeclaration
+					INT
+					val
+					declarationInitialization
+					;
+		cycleBlock
+			~ATH
+			(
+			optionalExpression
+				expression
+					term
+						val
+					=
+					expression
+						expression
+							indexing
+								term
+									list1
+								[
+								expression
+									term
+										i
+								]
+			)
+			{
+			optionalCycleBlock
+				cycleBlock
+					~ATH
+					(
+					)
+					{
+					}
+					EXECUTE
+					(
+					expression
+						composition
+							Print
+							{
+							parameter
+								parameter
+									expression
+										term
+											i
+										+
+										expression
+											term
+												": "
+											+
+											expression
+												term
+													val
+							}
+					)
+					;
+			}
+			EXECUTE
+			(
+			expression
+				term
+					NULL
+			)
+			;
+			cycleTerminator
+				THIS
+				->
+				DIE
+				(
+				)
+				;
+
+```

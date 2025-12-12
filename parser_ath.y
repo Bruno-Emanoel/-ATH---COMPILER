@@ -132,7 +132,6 @@ Node *root;
 %token <ival>    T_INTEGER
 %token <fval>    T_FLOAT
 %token <name>    T_CHAR T_STRING T_ID
-%token T_UNKNOWN
 
 
 
