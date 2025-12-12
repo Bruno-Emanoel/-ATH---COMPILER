@@ -151,7 +151,7 @@ Node *root;
 %type <node> entityBlock entityDeclaration
 %type <node> possessionList possesion possesionDeclaration
 %type <node> typeName expression term unitaryOperator operator terminal
-%type <node> cycleBlock cycleTerminator
+%type <node> cycleBlock optionalCycleBlock cycleTerminator
 
 %%
 /*import unitário
@@ -181,7 +181,6 @@ importDeclaration:
 
 multImportDeclaration:
     importDeclaration T_SP_COMMA multImportDeclaration {NODEFY("multImportDeclaration", 3, $1, makeNode(",", NULLCHILD), $3);}
-    | importDeclaration T_SP_COMMA importDeclaration {NODEFY("multImportDeclaration", 3, $1, makeNode(",", NULLCHILD), $3);}
     | importDeclaration {NODEFY("multmportDeclaration", 1, $1);}
     ;
 
@@ -224,7 +223,6 @@ expression:
     ;
     
 term:
-    term operator terminal                           { NODEFY("term", 3, $1,$2,$3); } | 
     T_SP_PARENTESESLFT expression T_SP_PARENTESESLFT { NODEFY("term", 3, makeNode("(",NULLCHILD),$2,makeNode(")",NULLCHILD)); } | 
     terminal                                         { NODEFY("term", 1, $1); }
     ;       
@@ -271,11 +269,14 @@ operator:
 | T_OP_ATRIB        { SINGLENODEFY("=");  }
     ;
  
-cycleBlock: { $$ = NULL; }| 
+cycleBlock: 
     T_ATH T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_BRACKETSLFT 
-    cycleBlock T_SP_BRACKETSRGT T_EXECUTE T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_SMCOLON
+    optionalCycleBlock T_SP_BRACKETSRGT T_EXECUTE T_SP_PARENTESESLFT expression T_SP_PARENTESESRGT T_SP_SMCOLON
     cycleTerminator {NODEFY("cycleBlock", 13, makeNode("~ATH", NULLCHILD), makeNode("(", NULLCHILD), $3, makeNode(")", NULLCHILD), makeNode("{", NULLCHILD), $6, makeNode("}", NULLCHILD), makeNode("EXECUTE", NULLCHILD), makeNode("(", NULLCHILD), $10, makeNode(")", NULLCHILD), makeNode(";", NULLCHILD), $13);}
             ;
+
+optionalCycleBlock: { $$ = NULL; } |
+    cycleBlock { NODEFY("optionalCycleBlock", 1, $1); }
 
 cycleTerminator: { $$ = NULL; } |
     T_THIS T_OP_ACCESS T_ID T_SP_PARENTESESLFT T_SP_PARENTESESRGT T_SP_SMCOLON      { NODEFY("cycleTerminator", 6, makeNode("THIS", NULLCHILD), makeNode("->", NULLCHILD), makeNode(($3), NULLCHILD), makeNode("(", NULLCHILD), makeNode(")", NULLCHILD), makeNode(";", NULLCHILD)); }
